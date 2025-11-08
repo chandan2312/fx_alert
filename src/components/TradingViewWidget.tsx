@@ -52,7 +52,20 @@ function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false
       popup_height: "650",
       studies: [],
       compareSymbols: [],
-      watchlist: []
+      watchlist: [],
+      // Hide symbol name and OHLC values
+      hide_symbol: true,
+      hide_ohlc: true,
+      // Show drawing toolbar on side
+      enabled_features: ["side_toolbar_in_fullscreen_mode", "header_in_fullscreen_mode"],
+      disabled_features: [
+        "header_symbol_search", 
+        "symbol_info", 
+        "header_interval_dialog_button",
+        "legend_widget",
+        "compare_symbol",
+        "border_around_the_chart"
+      ]
     });
     
     scriptRef.current = script;
@@ -70,6 +83,32 @@ function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false
   return (
     <div className="tradingview-widget-container h-full w-full" ref={container}>
       <div className="tradingview-widget-container__widget h-full w-full"></div>
+      <style jsx>{`
+        /* Scale down TradingView toolbars - 30% smaller on desktop */
+        .tradingview-widget-container :global(iframe) {
+          transform: scale(0.7);
+          transform-origin: top left;
+          width: 142.86% !important;
+          height: 142.86% !important;
+        }
+        
+        /* Scale down TradingView toolbars - 50% smaller on mobile */
+        @media (max-width: 768px) {
+          .tradingview-widget-container :global(iframe) {
+            transform: scale(0.5);
+            transform-origin: top left;
+            width: 200% !important;
+            height: 200% !important;
+          }
+        }
+        
+        /* Override TradingView toolbar sizes */
+        .tradingview-widget-container :global(.chart-controls-bar),
+        .tradingview-widget-container :global(.chart-page),
+        .tradingview-widget-container :global([class*="toolbar"]) {
+          font-size: 11px !important;
+        }
+      `}</style>
     </div>
   );
 }
