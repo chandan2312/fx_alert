@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Alert {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  symbol         String   // e.g., "EURUSD", "XAUUSD"
+  tv_symbol      String   // e.g., "OANDA:EURUSD"
+  api_symbol     String   // e.g., "EUR%2FUSD"
+  label          String   // Live, Super, Good, Bad, Formation, Other
+  alertLabel     String   @default("") // User's custom label for this alert
+  price          Float
+  type           String   // crossing_up, crossing_down
+  status         String   @default("active") // active, triggered, expired
+  createdAt      DateTime @default(now())
+  expirationDate DateTime?
+  triggeredAt    DateTime?
+  
+  @@index([status])
+  @@index([symbol])
+  @@index([createdAt])
+}
