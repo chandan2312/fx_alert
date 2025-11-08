@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import ChartWithAlerts from '../components/ChartWithAlerts'
 import LiveAlerts from '../components/LiveAlerts'
 import FullscreenChart from '../components/FullscreenChart'
+import BiasPopup from '../components/BiasPopup'
+import BiasSheetModal from '../components/BiasSheetModal'
 import { Symbol, SymbolLabel } from '../types'
 import { fetchLivePrices, LivePrice } from '../services/priceService'
 
@@ -80,30 +82,67 @@ export default function Home() {
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' }>({ show: false, message: '', type: 'success' })
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [biasSymbol, setBiasSymbol] = useState<string | null>(null)
+  const [showSymbolDropdown, setShowSymbolDropdown] = useState(false)
+  const [refreshingBias, setRefreshingBias] = useState(false)
+  const [biasProgress, setBiasProgress] = useState({ current: 0, total: 0 })
+  const [showBiasSheet, setShowBiasSheet] = useState(false)
+  const [biasSheetData, setBiasSheetData] = useState<Record<string, any>>({})
+  const [focusMode, setFocusMode] = useState(false)
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
   // Load symbol order from localStorage on mount
   useEffect(() => {
     const savedOrder = localStorage.getItem('symbolOrder')
+    const savedCategories = localStorage.getItem('symbolCategories')
+    
+    let updatedSymbols = [...symbols]
+    
+    // Load saved categories
+    if (savedCategories) {
+      try {
+        const categoriesMap = JSON.parse(savedCategories)
+        updatedSymbols = updatedSymbols.map(s => ({
+          ...s,
+          category: categoriesMap[s.value] || s.category
+        }))
+      } catch (error) {
+        console.error('Error loading symbol categories:', error)
+      }
+    }
+    
+    // Load saved order
     if (savedOrder) {
       try {
         const orderArray = JSON.parse(savedOrder)
         const reorderedSymbols = orderArray
-          .map((value: string) => symbols.find(s => s.value === value))
+          .map((value: string) => updatedSymbols.find(s => s.value === value))
           .filter((s: Symbol | undefined): s is Symbol => s !== undefined)
         
         // Add any new symbols that weren't in saved order
-        const missingSymbols = symbols.filter(s => !orderArray.includes(s.value))
-        setSymbols([...reorderedSymbols, ...missingSymbols])
+        const missingSymbols = updatedSymbols.filter(s => !orderArray.includes(s.value))
+        updatedSymbols = [...reorderedSymbols, ...missingSymbols]
       } catch (error) {
         console.error('Error loading symbol order:', error)
       }
     }
+    
+    setSymbols(updatedSymbols)
   }, [])
 
   // Save symbol order to localStorage whenever it changes
   const saveSymbolOrder = (newSymbols: Symbol[]) => {
     const orderArray = newSymbols.map(s => s.value)
     localStorage.setItem('symbolOrder', JSON.stringify(orderArray))
+  }
+
+  // Save symbol categories to localStorage
+  const saveSymbolCategories = (updatedSymbols: Symbol[]) => {
+    const categoriesMap: Record<string, SymbolLabel> = {}
+    updatedSymbols.forEach(s => {
+      categoriesMap[s.value] = s.category || 'Other'
+    })
+    localStorage.setItem('symbolCategories', JSON.stringify(categoriesMap))
   }
 
   // Fetch live prices ONLY on initial mount - use stale prices from localStorage
@@ -170,6 +209,15 @@ export default function Home() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // Scroll to top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.pageYOffset > 300)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   // Request notification permission on mount
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
@@ -187,6 +235,24 @@ export default function Home() {
       localStorage.setItem('darkMode', 'false')
     }
   }, [darkMode])
+
+  // Fetch bias sheet data
+  useEffect(() => {
+    const fetchBiasSheet = async () => {
+      try {
+        const response = await fetch('/api/bias-sheet')
+        const data = await response.json()
+        const dataMap: Record<string, any> = {}
+        data.forEach((sheet: any) => {
+          dataMap[sheet.symbol] = sheet
+        })
+        setBiasSheetData(dataMap)
+      } catch (error) {
+        console.error('Error fetching bias sheet:', error)
+      }
+    }
+    fetchBiasSheet()
+  }, [showBiasSheet])
 
   // Show toast notification
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -375,9 +441,12 @@ export default function Home() {
   }
 
   const handleLabelChange = (symbolValue: string, label: SymbolLabel) => {
-    setSymbols(symbols.map(s => 
+    const updatedSymbols = symbols.map(s => 
       s.value === symbolValue ? { ...s, category: label } : s
-    ))
+    )
+    setSymbols(updatedSymbols)
+    saveSymbolCategories(updatedSymbols)
+    showToast(`${symbolValue} category updated to ${label}`, 'success')
   }
 
   const getAlertsForSymbol = (symbolValue: string) => {
@@ -480,12 +549,22 @@ export default function Home() {
   // Memoize sorted symbols to avoid re-sorting on every render
   const labelOrder: SymbolLabel[] = ['Live', 'Super', 'Good', 'Bad', 'Formation', 'Other']
   const sortedSymbols = useMemo(() => {
-    return [...symbols].sort((a, b) => {
+    let filtered = [...symbols]
+    
+    // Apply focus mode filter
+    if (focusMode) {
+      filtered = filtered.filter(s => {
+        const category = s.category || 'Other'
+        return category === 'Live' || category === 'Super' || category === 'Good'
+      })
+    }
+    
+    return filtered.sort((a, b) => {
       const aCategory = a.category || 'Other'
       const bCategory = b.category || 'Other'
       return labelOrder.indexOf(aCategory) - labelOrder.indexOf(bCategory)
     })
-  }, [symbols])
+  }, [symbols, focusMode])
 
   const labelColors: Record<SymbolLabel, string> = {
     Live: 'bg-red-100 text-red-800 border-red-300',
@@ -511,21 +590,244 @@ export default function Home() {
     }
   }, [symbols])
 
+  // Scroll to specific symbol
+  const scrollToSymbol = (symbolValue: string) => {
+    const element = document.getElementById(`symbol-${symbolValue}`)
+    if (element) {
+      const headerHeight = 60 // Fixed header height
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+      setShowSymbolDropdown(false)
+    }
+  }
+
+  // Helper function to get indicator emoji
+  const getIndicatorEmoji = (value: string) => {
+    switch (value) {
+      case 'green': return '🟢'
+      case 'red': return '🔴'
+      case 'yellow': return '🟡'
+      default: return '⚪'
+    }
+  }
+
+  // Scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+
+  // Refresh all bias analyses
+  const refreshAllBiasAnalyses = async () => {
+    if (refreshingBias) return
+    
+    setRefreshingBias(true)
+    const total = symbols.length
+    setBiasProgress({ current: 0, total })
+    
+    let successCount = 0
+    let failCount = 0
+    
+    for (let i = 0; i < symbols.length; i++) {
+      const symbol = symbols[i]
+      setBiasProgress({ current: i + 1, total })
+      
+      try {
+        const response = await fetch('/api/bias', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol: symbol.value })
+        })
+        
+        if (response.ok) {
+          successCount++
+        } else {
+          failCount++
+        }
+      } catch (error) {
+        console.error(`Error updating bias for ${symbol.value}:`, error)
+        failCount++
+      }
+      
+      // Add a small delay to avoid overwhelming the API
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+    
+    setRefreshingBias(false)
+    setBiasProgress({ current: 0, total: 0 })
+    
+    if (successCount > 0) {
+      showToast(`✅ Updated ${successCount} bias analyses!`, 'success')
+    }
+    if (failCount > 0) {
+      showToast(`⚠️ Failed to update ${failCount} analyses`, 'error')
+    }
+  }
+
+  // Reset symbols to default order and categories
+  const resetSymbols = () => {
+    const confirmed = window.confirm('Are you sure you want to reset all symbols to default order and category (Other)?')
+    if (!confirmed) return
+    
+    const defaultSymbols: Symbol[] = [
+      { value: 'DXY', label: 'DXY/USD', api_symbol: 'DXY%2FUSD', tv_symbol: 'CAPITALCOM:DXY', category: 'Other' },
+      { value: 'XAUUSD', label: 'Gold/USD', api_symbol: 'Gold%2FUSD', tv_symbol: 'OANDA:XAUUSD', category: 'Other' },
+      { value: 'XAGUSD', label: 'Silver/USD', api_symbol: 'Silver%2FUSD', tv_symbol: 'OANDA:XAGUSD', category: 'Other' },
+      { value: 'BTCUSD', label: 'BTC/USD', api_symbol: 'BTC%2FUSD', tv_symbol: 'COINBASE:BTCUSD', category: 'Other' },
+      { value: 'ETHUSD', label: 'ETH/USD', api_symbol: 'ETH%2FUSD', tv_symbol: 'COINBASE:ETHUSD', category: 'Other' },
+      { value: 'US30', label: 'Dow/USD', api_symbol: 'Dow%2FUSD', tv_symbol: 'CAPITALCOM:US30', category: 'Other' },
+      { value: 'US100', label: 'NDX/USD', api_symbol: 'NDX%2FUSD', tv_symbol: 'CAPITALCOM:US100', category: 'Other' },
+      { value: 'US500', label: 'SPX/USD', api_symbol: 'SPX%2FUSD', tv_symbol: 'CAPITALCOM:US500', category: 'Other' },
+      { value: 'GER40', label: 'DAX/USD', api_symbol: 'DAX%2FUSD', tv_symbol: 'FOREXCOM:GER40', category: 'Other' },
+      { value: 'JP225', label: 'Nikkei225/USD', api_symbol: 'Nikkei225%2FUSD', tv_symbol: 'FOREXCOM:JP225', category: 'Other' },
+      { value: 'EURUSD', label: 'EUR/USD', api_symbol: 'EUR%2FUSD', tv_symbol: 'OANDA:EURUSD', category: 'Other' },
+      { value: 'GBPUSD', label: 'GBP/USD', api_symbol: 'GBP%2FUSD', tv_symbol: 'OANDA:GBPUSD', category: 'Other' },
+      { value: 'AUDUSD', label: 'AUD/USD', api_symbol: 'AUD%2FUSD', tv_symbol: 'OANDA:AUDUSD', category: 'Other' },
+      { value: 'USDCHF', label: 'USD/CHF', api_symbol: 'USD%2FCHF', tv_symbol: 'OANDA:USDCHF', category: 'Other' },
+      { value: 'USDJPY', label: 'USD/JPY', api_symbol: 'USD%2FJPY', tv_symbol: 'OANDA:USDJPY', category: 'Other' },
+      { value: 'USDCAD', label: 'USD/CAD', api_symbol: 'USD%2FCAD', tv_symbol: 'OANDA:USDCAD', category: 'Other' },
+      { value: 'CADJPY', label: 'CAD/JPY', api_symbol: 'CAD%2FJPY', tv_symbol: 'OANDA:CADJPY', category: 'Other' },
+      { value: 'EURCAD', label: 'EUR/CAD', api_symbol: 'EUR%2FCAD', tv_symbol: 'OANDA:EURCAD', category: 'Other' },
+      { value: 'GBPCAD', label: 'GBP/CAD', api_symbol: 'GBP%2FCAD', tv_symbol: 'OANDA:GBPCAD', category: 'Other' },
+      { value: 'SOLUSD', label: 'SOL/USD', api_symbol: 'SOL%2FUSD', tv_symbol: 'COINBASE:SOLUSD', category: 'Other' },
+      { value: 'ADAUSD', label: 'ADA/USD', api_symbol: 'ADA%2FUSD', tv_symbol: 'COINBASE:ADAUSD', category: 'Other' },
+      { value: 'XRPUSD', label: 'XRP/USD', api_symbol: 'XRP%2FUSD', tv_symbol: 'COINBASE:XRPUSD', category: 'Other' }
+    ]
+    
+    setSymbols(defaultSymbols)
+    localStorage.removeItem('symbolOrder')
+    localStorage.removeItem('symbolCategories')
+    showToast('✅ Symbols reset to default!', 'success')
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 md:py-4">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 py-2 shadow-sm">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">FX Alert System</h1>
-            <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">Set price alerts for forex pairs and indices</p>
+          <div className="flex items-center gap-2">
+            {/* Symbol Navigation Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSymbolDropdown(!showSymbolDropdown)}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                title="Navigate to Symbol"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              {showSymbolDropdown && (
+                <>
+                  <div className="fixed inset-0" onClick={() => setShowSymbolDropdown(false)} />
+                  <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto w-48 z-50">
+                    {sortedSymbols.map((symbol) => (
+                      <button
+                        key={symbol.value}
+                        onClick={() => scrollToSymbol(symbol.value)}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-800 dark:text-gray-200 transition-colors"
+                      >
+                        {symbol.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            <a
+              href="https://www.forexfactory.com/calendar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+              title="Forex Calendar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </a>
+            <a
+              href="https://www.forexfactory.com/news"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900 hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors"
+              title="Forex News"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-600 dark:text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </a>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setFocusMode(!focusMode)}
+              className={`p-2 rounded-lg transition-colors ${
+                focusMode 
+                  ? 'bg-yellow-200 dark:bg-yellow-700 hover:bg-yellow-300 dark:hover:bg-yellow-600' 
+                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+              title={focusMode ? 'Show All Symbols' : 'Focus Mode (Live/Super/Good)'}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${
+                focusMode ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-600 dark:text-gray-400'
+              }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+            <button
+              onClick={resetSymbols}
+              className="p-2 rounded-lg bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+              title="Reset Symbols to Default"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setShowBiasSheet(true)}
+              className="p-2 rounded-lg bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
+              title="Bias Sheet"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+              </svg>
+            </button>
+            <button
+              onClick={refreshAllBiasAnalyses}
+              disabled={refreshingBias}
+              className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
+              title="Refresh All Bias Analyses"
+            >
+              {refreshingBias ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-600 dark:text-purple-400 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {biasProgress.total > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                      {biasProgress.current}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              )}
+            </button>
             <button
               onClick={refreshPrices}
               className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
               title="Refresh Prices"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
@@ -535,11 +837,11 @@ export default function Home() {
               title={darkMode ? 'Light Mode' : 'Dark Mode'}
             >
               {darkMode ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
@@ -548,7 +850,8 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      {/* Main Content with top padding for fixed header */}
+      <div className="flex flex-1 overflow-hidden mt-14">
         <div className="flex-1 overflow-y-auto p-2 md:p-4 main-scroll-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {sortedSymbols.map((symbol, index) => {
@@ -558,80 +861,135 @@ export default function Home() {
               
               return (
                 <div 
+                  id={`symbol-${symbol.value}`}
                   key={symbol.value}
                   data-index={index}
                   className={`symbol-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all ${
                     draggedIndex === index ? 'opacity-50 scale-95 ring-2 ring-blue-500' : 'opacity-100 scale-100'
                   } hover:shadow-lg`}
                   draggable={!isMobile}
-                  onDragStart={(e) => handleDragStart(e, index)}
-                  onDragEnd={handleDragEnd}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, index)}
-                  onTouchStart={(e) => handleTouchStart(e, index)}
-                  onTouchMove={(e) => handleTouchMove(e, index)}
-                  onTouchEnd={handleTouchEnd}
+                  onDragStart={!isMobile ? (e) => handleDragStart(e, index) : undefined}
+                  onDragEnd={!isMobile ? handleDragEnd : undefined}
+                  onDragOver={!isMobile ? handleDragOver : undefined}
+                  onDrop={!isMobile ? (e) => handleDrop(e, index) : undefined}
                 >
                   <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center mb-3">
-                      <div className="flex items-center gap-2 flex-1">
-                        {/* Drag Handle */}
-                        <div className="flex items-center gap-1">
-                          <div className="cursor-grab active:cursor-grabbing p-1" title="Drag to reorder">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-                            </svg>
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <button
-                              onClick={() => moveSymbol(index, 'up')}
-                              disabled={index === 0}
-                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                              title="Move up"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => moveSymbol(index, 'down')}
-                              disabled={index === sortedSymbols.length - 1}
-                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                              title="Move down"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-baseline gap-2">
-                          <h2 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">{symbol.label}</h2>
+                    {/* Mobile Layout: Compact 2-row design */}
+                    <div className="md:hidden">
+                      {/* Row 1: Symbol name, price, and status */}
+                      <div className="flex items-center justify-between mb-2 gap-2">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <h2 className="text-base font-semibold text-gray-800 dark:text-white truncate">{symbol.label}</h2>
                           {livePrice && (
-                            <span className="text-sm font-medium text-green-600 dark:text-green-400">${livePrice.toFixed(4)}</span>
+                            <span className="text-xs font-medium text-green-600 dark:text-green-400 whitespace-nowrap">${livePrice.toFixed(4)}</span>
                           )}
                         </div>
+                        <select
+                          value={category}
+                          onChange={(e) => handleLabelChange(symbol.value, e.target.value as SymbolLabel)}
+                          className={`text-xs px-1.5 py-0.5 rounded border ${labelColors[category]} cursor-pointer flex-shrink-0`}
+                        >
+                          {labelOrder.map((label) => (
+                            <option key={label} value={label}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {/* Row 2: Bias and Fullscreen buttons */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setBiasSymbol(symbol.value)}
+                          className="flex-1 px-2 py-1.5 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded text-xs font-medium text-purple-700 dark:text-purple-300 transition-colors flex items-center justify-center gap-1"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                          AI Bias
+                        </button>
                         <button
                           onClick={() => handleFullscreen(symbol)}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                          title="View Fullscreen"
+                          className="flex-1 px-2 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors flex items-center justify-center gap-1"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                           </svg>
+                          Chart
                         </button>
                       </div>
-                      <select
-                        value={category}
-                        onChange={(e) => handleLabelChange(symbol.value, e.target.value as SymbolLabel)}
-                        className={`text-xs px-2 py-1 rounded border ${labelColors[category]} cursor-pointer`}
-                      >
-                        {labelOrder.map((label) => (
-                          <option key={label} value={label}>
-                            {label}
-                          </option>
-                        ))}
-                      </select>
+                    </div>
+
+                    {/* Desktop Layout: Original design with drag handle */}
+                    <div className="hidden md:block">
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-2 flex-1">
+                          {/* Drag Handle - Desktop only */}
+                          <div className="flex items-center gap-1">
+                            <div className="cursor-grab active:cursor-grabbing p-1" title="Drag to reorder">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <button
+                                onClick={() => moveSymbol(index, 'up')}
+                                disabled={index === 0}
+                                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                title="Move up"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => moveSymbol(index, 'down')}
+                                disabled={index === sortedSymbols.length - 1}
+                                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                title="Move down"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex items-baseline gap-2">
+                            <h2 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">{symbol.label}</h2>
+                            {livePrice && (
+                              <span className="text-sm font-medium text-green-600 dark:text-green-400">${livePrice.toFixed(4)}</span>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => setBiasSymbol(symbol.value)}
+                            className="p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900 rounded transition-colors"
+                            title="View AI Bias Analysis"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleFullscreen(symbol)}
+                            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                            title="View Fullscreen"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                            </svg>
+                          </button>
+                        </div>
+                        <select
+                          value={category}
+                          onChange={(e) => handleLabelChange(symbol.value, e.target.value as SymbolLabel)}
+                          className={`text-xs px-2 py-1 rounded border ${labelColors[category]} cursor-pointer`}
+                        >
+                          {labelOrder.map((label) => (
+                            <option key={label} value={label}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                     
                     <div className="space-y-2 mb-3">
@@ -696,7 +1054,7 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  <div className="h-80 md:h-96">
+                  <div className="h-[450px]">
                     <ChartWithAlerts 
                       symbolValue={symbol.value}
                       tvSymbol={symbol.tv_symbol}
@@ -711,7 +1069,40 @@ export default function Home() {
                     activeAlerts={activeDbAlerts}
                     triggeredAlerts={triggeredDbAlerts}
                     onDelete={handleAlertDelete}
+                    currentPrice={livePrice || undefined}
                   />
+                  
+                  {/* Bias Sheet Row */}
+                  {biasSheetData[symbol.value] && (
+                    <div className="px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-t border-gray-200 dark:border-gray-700">
+                      <div className="grid grid-cols-6 gap-2 text-center text-xs">
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">Bias</div>
+                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].bias)}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">USD</div>
+                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].usdBias)}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">PD</div>
+                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].pdCandle)}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">Dir</div>
+                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].direction)}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">HTF</div>
+                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].htfTrend)}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">LTF</div>
+                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].ltfTrend)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -727,6 +1118,22 @@ export default function Home() {
           tvSymbol={fullscreenSymbol.tv_symbol}
           darkMode={darkMode}
           onClose={closeFullscreen}
+        />
+      )}
+
+      {/* Bias Analysis Popup */}
+      {biasSymbol && (
+        <BiasPopup
+          symbol={biasSymbol}
+          onClose={() => setBiasSymbol(null)}
+        />
+      )}
+
+      {/* Bias Sheet Modal */}
+      {showBiasSheet && (
+        <BiasSheetModal
+          symbols={symbols}
+          onClose={() => setShowBiasSheet(false)}
         />
       )}
 
@@ -750,6 +1157,19 @@ export default function Home() {
             <span>{toast.message}</span>
           </div>
         </div>
+      )}
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 p-3 bg-gray-900/20 dark:bg-white/20 hover:bg-gray-900/40 dark:hover:bg-white/40 backdrop-blur-sm rounded-full shadow-lg transition-all duration-300 z-40"
+          title="Scroll to Top"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
       )}
     </div>
   )

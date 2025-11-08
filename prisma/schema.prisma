@@ -28,3 +28,28 @@ model Alert {
   @@index([symbol])
   @@index([createdAt])
 }
+
+model BiasAnalysis {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  symbol    String   @unique
+  direction String   // BULLISH, BEARISH, NEUTRAL
+  analysis  String   // Full analysis text from Gemini
+  justification String // Single sentence summary
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([updatedAt])
+}
+
+model BiasSheet {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  symbol     String   @unique
+  bias       String   @default("neutral") // green, red, yellow
+  usdBias    String   @default("neutral") // green, red, yellow
+  pdCandle   String   @default("neutral") // green, red, yellow
+  direction  String   @default("neutral") // green, red, yellow
+  htfTrend   String   @default("neutral") // green, red, yellow
+  ltfTrend   String   @default("neutral") // green, red, yellow
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

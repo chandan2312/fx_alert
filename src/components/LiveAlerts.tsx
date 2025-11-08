@@ -17,12 +17,22 @@ interface LiveAlertsProps {
   activeAlerts: DbAlert[]
   triggeredAlerts: DbAlert[]
   onDelete: (id: string) => void
+  currentPrice?: number
 }
 
-const LiveAlerts = memo(function LiveAlerts({ symbolValue, activeAlerts, triggeredAlerts, onDelete }: LiveAlertsProps) {
+const LiveAlerts = memo(function LiveAlerts({ symbolValue, activeAlerts, triggeredAlerts, onDelete, currentPrice }: LiveAlertsProps) {
   // Filter alerts for this specific symbol
   const symbolActiveAlerts = activeAlerts.filter(a => a.symbol === symbolValue)
   const symbolTriggeredAlerts = triggeredAlerts.filter(a => a.symbol === symbolValue).slice(0, 5)
+
+  // Sort active alerts by distance from current price (nearest first)
+  const sortedActiveAlerts = currentPrice 
+    ? [...symbolActiveAlerts].sort((a, b) => {
+        const distA = Math.abs(a.price - currentPrice)
+        const distB = Math.abs(b.price - currentPrice)
+        return distA - distB
+      })
+    : symbolActiveAlerts
 
   const handleDelete = async (id: string) => {
     try {
@@ -43,17 +53,17 @@ const LiveAlerts = memo(function LiveAlerts({ symbolValue, activeAlerts, trigger
     })
   }
 
-  if (symbolActiveAlerts.length === 0 && symbolTriggeredAlerts.length === 0) {
+  if (sortedActiveAlerts.length === 0 && symbolTriggeredAlerts.length === 0) {
     return null
   }
 
   return (
     <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
       {/* Active Alerts */}
-      {symbolActiveAlerts.length > 0 && (
+      {sortedActiveAlerts.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap mb-2">
           <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Active:</span>
-          {symbolActiveAlerts.map((alert) => (
+          {sortedActiveAlerts.map((alert) => (
             <div
               key={alert.id}
               className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 rounded text-xs"
