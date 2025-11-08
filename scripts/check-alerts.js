@@ -187,15 +187,11 @@ async function checkAlerts() {
         })
         
         // Create notification message
-        const direction = alert.type === 'crossing_up' ? '🟢 UP' : '🔴 DOWN'
-        const labelText = alert.alertLabel ? ` - ${alert.alertLabel}` : ''
+        const direction = alert.type === 'crossing_up' ? '⬆️ UP' : '⬇️ DOWN'
+        const labelText = alert.alertLabel || '-'
+        const category = alert.label || '-'
         
-        const message = `🚨 <b>ALERT TRIGGERED</b>\n\n` +
-          `Symbol: <b>${alert.symbol}</b>${labelText}\n` +
-          `Price: <b>${alert.price}</b> ${direction}\n` +
-          `Current: <b>${currentPrice.toFixed(4)}</b>\n` +
-          `Category: <i>${alert.label}</i>\n` +
-          `Time: ${time}`
+        const message = `${alert.symbol} - ${labelText} - ${direction} - ${alert.price} - ${category}`
         
         console.log('📝 Message to send:', message)
         

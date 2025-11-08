@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
+// Disable caching for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const prisma = new PrismaClient()
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
@@ -87,6 +91,12 @@ export async function GET() {
         success: true,
         message: 'No active alerts to check',
         triggered: 0
+      }, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
       })
     }
     
@@ -148,15 +158,11 @@ export async function GET() {
         })
         
         // Create notification message
-        const direction = alert.type === 'crossing_up' ? '🟢 UP' : '🔴 DOWN'
-        const labelText = alert.alertLabel ? ` - ${alert.alertLabel}` : ''
+        const direction = alert.type === 'crossing_up' ? '⬆️ UP' : '⬇️ DOWN'
+        const labelText = alert.alertLabel || '-'
+        const category = alert.label || '-'
         
-        const message = `🚨 <b>ALERT TRIGGERED</b>\n\n` +
-          `Symbol: <b>${alert.symbol}</b>${labelText}\n` +
-          `Price: <b>${alert.price}</b> ${direction}\n` +
-          `Current: <b>${currentPrice.toFixed(4)}</b>\n` +
-          `Category: <i>${alert.label}</i>\n` +
-          `Time: ${time}`
+        const message = `${alert.symbol} - ${labelText} - ${direction} - ${alert.price} - ${category}`
         
         // Send Telegram notification
         const sent = await sendTelegramNotification(message)
@@ -188,6 +194,12 @@ export async function GET() {
       totalAlerts: activeAlerts.length,
       triggered: triggeredAlerts.length,
       results
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     })
     
   } catch (error) {
@@ -200,7 +212,14 @@ export async function GET() {
         error: 'Failed to check alerts',
         message: error instanceof Error ? error.message : 'Unknown error'
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
     )
   }
 }
