@@ -11,12 +11,17 @@ interface TradingViewWidgetProps {
 
 function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false }: TradingViewWidgetProps) {
   const container = useRef<HTMLDivElement>(null);
-  const hasInitialized = useRef(false);
   const widgetRef = useRef<any>(null);
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
 
   useEffect(() => {
-    if (!container.current || hasInitialized.current) return;
-    hasInitialized.current = true;
+    if (!container.current) return;
+
+    // Clear previous widget completely to prevent memory leaks
+    if (scriptRef.current) {
+      container.current.innerHTML = '';
+      scriptRef.current = null;
+    }
 
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
@@ -50,8 +55,17 @@ function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false
       watchlist: []
     });
     
+    scriptRef.current = script;
     container.current.appendChild(script);
-  }, [symbol]);
+
+    return () => {
+      // Cleanup: remove script and clear container
+      if (container.current) {
+        container.current.innerHTML = '';
+      }
+      scriptRef.current = null;
+    };
+  }, [symbol, darkMode]);
 
   return (
     <div className="tradingview-widget-container h-full w-full" ref={container}>

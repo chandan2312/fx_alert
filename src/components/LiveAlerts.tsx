@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { memo } from 'react'
 
 interface DbAlert {
   id: string
@@ -14,44 +14,20 @@ interface DbAlert {
 
 interface LiveAlertsProps {
   symbolValue: string
+  activeAlerts: DbAlert[]
+  triggeredAlerts: DbAlert[]
   onDelete: (id: string) => void
 }
 
-export default function LiveAlerts({ symbolValue, onDelete }: LiveAlertsProps) {
-  const [activeAlerts, setActiveAlerts] = useState<DbAlert[]>([])
-  const [triggeredAlerts, setTriggeredAlerts] = useState<DbAlert[]>([])
-
-  const fetchAlerts = async () => {
-    try {
-      // Fetch active alerts
-      const activeRes = await fetch('/api/alerts?status=active')
-      const allActiveAlerts = await activeRes.json()
-      const symbolActiveAlerts = allActiveAlerts.filter((a: DbAlert) => a.symbol === symbolValue)
-      setActiveAlerts(symbolActiveAlerts)
-
-      // Fetch triggered alerts
-      const triggeredRes = await fetch('/api/alerts?status=triggered')
-      const allTriggeredAlerts = await triggeredRes.json()
-      const symbolTriggeredAlerts = allTriggeredAlerts
-        .filter((a: DbAlert) => a.symbol === symbolValue)
-        .slice(0, 5) // Show only last 5 triggered
-      setTriggeredAlerts(symbolTriggeredAlerts)
-    } catch (error) {
-      console.error('Error fetching alerts:', error)
-    }
-  }
-
-  useEffect(() => {
-    fetchAlerts()
-    const interval = setInterval(fetchAlerts, 5000)
-    return () => clearInterval(interval)
-  }, [symbolValue])
+const LiveAlerts = memo(function LiveAlerts({ symbolValue, activeAlerts, triggeredAlerts, onDelete }: LiveAlertsProps) {
+  // Filter alerts for this specific symbol
+  const symbolActiveAlerts = activeAlerts.filter(a => a.symbol === symbolValue)
+  const symbolTriggeredAlerts = triggeredAlerts.filter(a => a.symbol === symbolValue).slice(0, 5)
 
   const handleDelete = async (id: string) => {
     try {
       await fetch(`/api/alerts?id=${id}`, { method: 'DELETE' })
       onDelete(id)
-      fetchAlerts()
     } catch (error) {
       console.error('Error deleting alert:', error)
     }
@@ -67,17 +43,17 @@ export default function LiveAlerts({ symbolValue, onDelete }: LiveAlertsProps) {
     })
   }
 
-  if (activeAlerts.length === 0 && triggeredAlerts.length === 0) {
+  if (symbolActiveAlerts.length === 0 && symbolTriggeredAlerts.length === 0) {
     return null
   }
 
   return (
     <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
       {/* Active Alerts */}
-      {activeAlerts.length > 0 && (
+      {symbolActiveAlerts.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap mb-2">
           <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Active:</span>
-          {activeAlerts.map((alert) => (
+          {symbolActiveAlerts.map((alert) => (
             <div
               key={alert.id}
               className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 rounded text-xs"
@@ -102,10 +78,10 @@ export default function LiveAlerts({ symbolValue, onDelete }: LiveAlertsProps) {
       )}
 
       {/* Triggered Alerts */}
-      {triggeredAlerts.length > 0 && (
+      {symbolTriggeredAlerts.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Triggered:</span>
-          {triggeredAlerts.map((alert) => (
+          {symbolTriggeredAlerts.map((alert) => (
             <div
               key={alert.id}
               className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 rounded text-xs"
@@ -114,9 +90,6 @@ export default function LiveAlerts({ symbolValue, onDelete }: LiveAlertsProps) {
                 {alert.type === 'crossing_up' ? '↑' : '↓'}
               </span>
               <span className="font-medium text-gray-800 dark:text-gray-200">{alert.price}</span>
-              {alert.alertLabel && (
-                <span className="text-gray-600 dark:text-gray-400 text-[10px] italic">({alert.alertLabel})</span>
-              )}
               <span className="text-gray-500 dark:text-gray-400 text-[10px] ml-1">
                 {alert.triggeredAt && formatTime(alert.triggeredAt)}
               </span>
@@ -133,4 +106,6 @@ export default function LiveAlerts({ symbolValue, onDelete }: LiveAlertsProps) {
       )}
     </div>
   )
-}
+})
+
+export default LiveAlerts

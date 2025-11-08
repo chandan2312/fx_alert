@@ -7,41 +7,52 @@ interface ChartWithAlertsProps {
   symbolValue: string
   tvSymbol: string
   darkMode?: boolean
+  alerts: Array<{ price: number; type: string }>
 }
 
-interface DbAlert {
-  id: string
-  symbol: string
-  price: number
-  type: string
-  status: string
-}
-
-export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = false }: ChartWithAlertsProps) {
-  const [alerts, setAlerts] = useState<Array<{ price: number; type: string }>>([])
-  const hasRendered = useRef(false)
-
-  const fetchAlerts = async () => {
-    try {
-      const res = await fetch('/api/alerts?status=active')
-      const allAlerts: DbAlert[] = await res.json()
-      const symbolAlerts = allAlerts
-        .filter((a) => a.symbol === symbolValue)
-        .map((a) => ({ price: a.price, type: a.type }))
-      setAlerts(symbolAlerts)
-    } catch (error) {
-      console.error('Error fetching alerts for chart:', error)
-    }
-  }
+export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = false, alerts }: ChartWithAlertsProps) {
+  const [isVisible, setIsVisible] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!hasRendered.current) {
-      hasRendered.current = true
-      fetchAlerts()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Only render chart when it's in viewport or near it (100px margin)
+          if (entry.isIntersecting) {
+            setIsVisible(true)
+          } else if (!entry.isIntersecting && entry.boundingClientRect.top > window.innerHeight + 200) {
+            // Unload chart if it's far below viewport to save memory
+            setIsVisible(false)
+          }
+        })
+      },
+      {
+        rootMargin: '200px', // Start loading 200px before entering viewport
+        threshold: 0
+      }
+    )
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
     }
-    const interval = setInterval(fetchAlerts, 10000)
-    return () => clearInterval(interval)
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current)
+      }
+    }
   }, [])
 
-  return <TradingViewWidget symbol={tvSymbol} alerts={alerts} darkMode={darkMode} />
+  return (
+    <div ref={containerRef} className="h-full w-full">
+      {isVisible ? (
+        <TradingViewWidget key={`${tvSymbol}-${darkMode}`} symbol={tvSymbol} alerts={alerts} darkMode={darkMode} />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+          <div className="text-gray-500 dark:text-gray-400 text-sm">Loading chart...</div>
+        </div>
+      )}
+    </div>
+  )
 }
