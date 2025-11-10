@@ -677,17 +677,17 @@ export default function Home() {
     if (!confirmed) return
     
     const defaultSymbols: Symbol[] = [
-      { value: 'XAUUSD', label: 'Gold/USD', api_symbol: 'Gold%2FUSD', tv_symbol: 'OANDA:XAUUSD', category: 'Other' }
-      { value: 'BTCUSD', label: 'BTC/USD', api_symbol: 'BTC%2FUSD', tv_symbol: 'COINBASE:BTCUSD', category: 'Other' }
+      { value: 'XAUUSD', label: 'Gold/USD', api_symbol: 'Gold%2FUSD', tv_symbol: 'OANDA:XAUUSD', category: 'Other' },
+      { value: 'BTCUSD', label: 'BTC/USD', api_symbol: 'BTC%2FUSD', tv_symbol: 'COINBASE:BTCUSD', category: 'Other' },
       { value: 'US30', label: 'Dow/USD', api_symbol: 'Dow%2FUSD', tv_symbol: 'CAPITALCOM:US30', category: 'Other' },
       { value: 'US100', label: 'NDX/USD', api_symbol: 'NDX%2FUSD', tv_symbol: 'CAPITALCOM:US100', category: 'Other' },
       { value: 'US500', label: 'SPX/USD', api_symbol: 'SPX%2FUSD', tv_symbol: 'CAPITALCOM:US500', category: 'Other' },
       { value: 'GER40', label: 'DAX/USD', api_symbol: 'DAX%2FUSD', tv_symbol: 'FOREXCOM:GER40', category: 'Other' },
       { value: 'JP225', label: 'Nikkei225/USD', api_symbol: 'Nikkei225%2FUSD', tv_symbol: 'FOREXCOM:JP225', category: 'Other' },
       { value: 'EURUSD', label: 'EUR/USD', api_symbol: 'EUR%2FUSD', tv_symbol: 'OANDA:EURUSD', category: 'Other' },
-      { value: 'GBPUSD', label: 'GBP/USD', api_symbol: 'GBP%2FUSD', tv_symbol: 'OANDA:GBPUSD', category: 'Other' }
-      { value: 'USDJPY', label: 'USD/JPY', api_symbol: 'USD%2FJPY', tv_symbol: 'OANDA:USDJPY', category: 'Other' }
-      { value: 'CADJPY', label: 'CAD/JPY', api_symbol: 'CAD%2FJPY', tv_symbol: 'OANDA:CADJPY', category: 'Other' }
+      { value: 'GBPUSD', label: 'GBP/USD', api_symbol: 'GBP%2FUSD', tv_symbol: 'OANDA:GBPUSD', category: 'Other' },
+      { value: 'USDJPY', label: 'USD/JPY', api_symbol: 'USD%2FJPY', tv_symbol: 'OANDA:USDJPY', category: 'Other' },
+      { value: 'CADJPY', label: 'CAD/JPY', api_symbol: 'CAD%2FJPY', tv_symbol: 'OANDA:CADJPY', category: 'Other' },
       { value: 'SOLUSD', label: 'SOL/USD', api_symbol: 'SOL%2FUSD', tv_symbol: 'COINBASE:SOLUSD', category: 'Other' },
       { value: 'ADAUSD', label: 'ADA/USD', api_symbol: 'ADA%2FUSD', tv_symbol: 'COINBASE:ADAUSD', category: 'Other' },
       { value: 'XRPUSD', label: 'XRP/USD', api_symbol: 'XRP%2FUSD', tv_symbol: 'COINBASE:XRPUSD', category: 'Other' }
