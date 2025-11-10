@@ -8,9 +8,10 @@ interface ChartWithAlertsProps {
   tvSymbol: string
   darkMode?: boolean
   alerts: Array<{ price: number; type: string }>
+  currentPrice?: number
 }
 
-export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = false, alerts }: ChartWithAlertsProps) {
+export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = false, alerts, currentPrice }: ChartWithAlertsProps) {
   const [isVisible, setIsVisible] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -47,7 +48,13 @@ export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = fals
   return (
     <div ref={containerRef} className="h-full w-full">
       {isVisible ? (
-        <TradingViewWidget key={`${tvSymbol}-${darkMode}`} symbol={tvSymbol} alerts={alerts} darkMode={darkMode} />
+        <TradingViewWidget 
+          key={`${tvSymbol}-${darkMode}`} 
+          symbol={tvSymbol} 
+          alerts={alerts} 
+          darkMode={darkMode}
+          currentPrice={currentPrice}
+        />
       ) : (
         <div className="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
           <div className="text-gray-500 dark:text-gray-400 text-sm">Loading chart...</div>

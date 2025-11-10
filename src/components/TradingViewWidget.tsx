@@ -7,9 +7,10 @@ interface TradingViewWidgetProps {
   alerts?: Array<{ price: number; type: string }>;
   onFullscreen?: () => void;
   darkMode?: boolean;
+  currentPrice?: number;
 }
 
-function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false }: TradingViewWidgetProps) {
+function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false, currentPrice }: TradingViewWidgetProps) {
   const container = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
   const scriptRef = useRef<HTMLScriptElement | null>(null);
@@ -81,7 +82,7 @@ function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false
   }, [symbol, darkMode]);
 
   return (
-    <div className="tradingview-widget-container h-full w-full" ref={container}>
+    <div className="tradingview-widget-container h-full w-full relative" ref={container}>
       <div className="tradingview-widget-container__widget h-full w-full"></div>
       <style jsx>{`
         /* Scale down TradingView toolbars - 30% smaller on desktop */
