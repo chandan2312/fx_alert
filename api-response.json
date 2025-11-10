@@ -1,0 +1,2053 @@
+{
+  "data": [
+    {
+      "instrument": {
+        "id": 7,
+        "name": "EUR/USD",
+        "display_name": "EUR/USD",
+        "instrument_class_name": "Forex",
+        "instrument_class_id": 1,
+        "instrument_prefix": "",
+        "instrument_suffix": "",
+        "site_id": 1,
+        "is_price_adjustments": false,
+        "is_auto_drifting": false,
+        "drift_instrument": null,
+        "decimals": 4,
+        "is_centralized": false,
+        "is_in_holiday": false,
+        "start_holiday_timestamp": null,
+        "next_holiday_timestamp": 1763157600,
+        "end_holiday_timestamp": null
+      },
+      "metrics": {
+        "M10": {
+          "low": 1.156,
+          "high": 1.15644,
+          "price": 1.15631,
+          "spread": 0.7
+        },
+        "M5": {
+          "low": 1.1562,
+          "high": 1.15644,
+          "price": 1.15637,
+          "spread": 0.7
+        },
+        "D1": {
+          "low": 1.15416,
+          "high": 1.15829,
+          "price": 1.15552,
+          "spread": 0.6
+        },
+        "M20": {
+          "low": 1.156,
+          "high": 1.15644,
+          "price": 1.15616,
+          "spread": 0.7
+        },
+        "H5": {
+          "low": 1.15536,
+          "high": 1.15829,
+          "price": 1.1557,
+          "spread": 0.8
+        },
+        "H1": {
+          "low": 1.15542,
+          "high": 1.15644,
+          "price": 1.15596,
+          "spread": 0.9
+        },
+        "H2": {
+          "low": 1.15542,
+          "high": 1.15713,
+          "price": 1.15683,
+          "spread": 1.2
+        },
+        "M30": {
+          "low": 1.15583,
+          "high": 1.15644,
+          "price": 1.15584,
+          "spread": 0.7
+        },
+        "H12": {
+          "low": 1.15431,
+          "high": 1.15829,
+          "price": 1.15497,
+          "spread": 0.6
+        },
+        "H4": {
+          "low": 1.15542,
+          "high": 1.15829,
+          "price": 1.1569,
+          "spread": 0.9
+        },
+        "H3": {
+          "low": 1.15542,
+          "high": 1.15727,
+          "price": 1.15713,
+          "spread": 1
+        },
+        "M25": {
+          "low": 1.15588,
+          "high": 1.15644,
+          "price": 1.15589,
+          "spread": 0.7
+        },
+        "D2": {
+          "low": 1.15416,
+          "high": 1.15829,
+          "price": 1.15552,
+          "spread": 0.7
+        },
+        "M15": {
+          "low": 1.156,
+          "high": 1.15644,
+          "price": 1.15632,
+          "spread": 0.7
+        },
+        "H6": {
+          "low": 1.15516,
+          "high": 1.15829,
+          "price": 1.15631,
+          "spread": 0.7
+        }
+      },
+      "quotes": [
+        {
+          "data_source_id": "ACY",
+          "instrument": "EUR/USD",
+          "bid": 1.08762,
+          "ask": 1.08765,
+          "bid_rounded": 1.08762,
+          "ask_rounded": 1.08765,
+          "timestamp": 1730433917
+        },
+        {
+          "data_source_id": "ADM",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15639,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "AET",
+          "instrument": "EUR/USD",
+          "bid": 1.16816,
+          "ask": 1.16828,
+          "bid_rounded": 1.16816,
+          "ask_rounded": 1.16828,
+          "timestamp": 1527837125
+        },
+        {
+          "data_source_id": "AFT",
+          "instrument": "EUR/USD",
+          "bid": 1.11369,
+          "ask": 1.11369,
+          "bid_rounded": 1.11369,
+          "ask_rounded": 1.11369,
+          "timestamp": 1727755424
+        },
+        {
+          "data_source_id": "ATV",
+          "instrument": "EUR/USD",
+          "bid": 1.15635,
+          "ask": 1.15644,
+          "bid_rounded": 1.15635,
+          "ask_rounded": 1.15644,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "AVA",
+          "instrument": "EUR/USD",
+          "bid": 1.15636,
+          "ask": 1.15644,
+          "bid_rounded": 1.15636,
+          "ask_rounded": 1.15644,
+          "timestamp": 1762776162
+        },
+        {
+          "data_source_id": "AXI",
+          "instrument": "EUR/USD",
+          "bid": 1.12051,
+          "ask": 1.12072,
+          "bid_rounded": 1.12051,
+          "ask_rounded": 1.12072,
+          "timestamp": 1559055695
+        },
+        {
+          "data_source_id": "BBM",
+          "instrument": "EUR/USD",
+          "bid": 1.08281,
+          "ask": 1.08283,
+          "bid_rounded": 1.08281,
+          "ask_rounded": 1.08283,
+          "timestamp": 1743480232
+        },
+        {
+          "data_source_id": "BDS",
+          "instrument": "EUR/USD",
+          "bid": 1.09197,
+          "ask": 1.09212,
+          "bid_rounded": 1.09197,
+          "ask_rounded": 1.09212,
+          "timestamp": 1742304118
+        },
+        {
+          "data_source_id": "CFI",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.1564,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "CMC",
+          "instrument": "EUR/USD",
+          "bid": 1.15637,
+          "ask": 1.1564,
+          "bid_rounded": 1.15637,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776173
+        },
+        {
+          "data_source_id": "cpl",
+          "instrument": "EUR/USD",
+          "bid": 1.08059,
+          "ask": 1.08065,
+          "bid_rounded": 1.08059,
+          "ask_rounded": 1.08065,
+          "timestamp": 1706763795
+        },
+        {
+          "data_source_id": "CSP",
+          "instrument": "EUR/USD",
+          "bid": 1.23801,
+          "ask": 1.23808,
+          "bid_rounded": 1.23801,
+          "ask_rounded": 1.23808,
+          "timestamp": 1523913939
+        },
+        {
+          "data_source_id": "DER",
+          "instrument": "EUR/USD",
+          "bid": 1.15636,
+          "ask": 1.15642,
+          "bid_rounded": 1.15636,
+          "ask_rounded": 1.15642,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "EBC",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15639,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776162
+        },
+        {
+          "data_source_id": "EIG",
+          "instrument": "EUR/USD",
+          "bid": 1.15638,
+          "ask": 1.15639,
+          "bid_rounded": 1.15638,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776178
+        },
+        {
+          "data_source_id": "ESY",
+          "instrument": "EUR/USD",
+          "bid": 1.15637,
+          "ask": 1.15644,
+          "bid_rounded": 1.15637,
+          "ask_rounded": 1.15644,
+          "timestamp": 1762776163
+        },
+        {
+          "data_source_id": "ETX",
+          "instrument": "EUR/USD",
+          "bid": 1.1218,
+          "ask": 1.12188,
+          "bid_rounded": 1.1218,
+          "ask_rounded": 1.12188,
+          "timestamp": 1559055695
+        },
+        {
+          "data_source_id": "EXN",
+          "instrument": "EUR/USD",
+          "bid": 1.15636,
+          "ask": 1.15644,
+          "bid_rounded": 1.15636,
+          "ask_rounded": 1.15644,
+          "timestamp": 1762776167
+        },
+        {
+          "data_source_id": "FBS",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15647,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15647,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "FCM",
+          "instrument": "EUR/USD",
+          "bid": 1.17885,
+          "ask": 1.17893,
+          "bid_rounded": 1.17885,
+          "ask_rounded": 1.17893,
+          "timestamp": 1751342587
+        },
+        {
+          "data_source_id": "FIX",
+          "instrument": "EUR/USD",
+          "bid": 1.16806,
+          "ask": 1.16809,
+          "bid_rounded": 1.16806,
+          "ask_rounded": 1.16809,
+          "timestamp": 1533096305
+        },
+        {
+          "data_source_id": "FOR",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.1564,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776179
+        },
+        {
+          "data_source_id": "FPM",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15639,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776164
+        },
+        {
+          "data_source_id": "FSN",
+          "instrument": "EUR/USD",
+          "bid": 1.08334,
+          "ask": 1.08334,
+          "bid_rounded": 1.08334,
+          "ask_rounded": 1.08334,
+          "timestamp": 1722485018
+        },
+        {
+          "data_source_id": "FTB",
+          "instrument": "EUR/USD",
+          "bid": 1.08142,
+          "ask": 1.08154,
+          "bid_rounded": 1.08142,
+          "ask_rounded": 1.08154,
+          "timestamp": 1743497492
+        },
+        {
+          "data_source_id": "FXGT",
+          "instrument": "EUR/USD",
+          "bid": 1.1038,
+          "ask": 1.10398,
+          "bid_rounded": 1.1038,
+          "ask_rounded": 1.10398,
+          "timestamp": 1690814006
+        },
+        {
+          "data_source_id": "FXP",
+          "instrument": "EUR/USD",
+          "bid": 1.15635,
+          "ask": 1.15644,
+          "bid_rounded": 1.15635,
+          "ask_rounded": 1.15644,
+          "timestamp": 1762776172
+        },
+        {
+          "data_source_id": "FXT",
+          "instrument": "EUR/USD",
+          "bid": 1.15728,
+          "ask": 1.1573,
+          "bid_rounded": 1.15728,
+          "ask_rounded": 1.1573,
+          "timestamp": 1754330922
+        },
+        {
+          "data_source_id": "FxTrade",
+          "instrument": "EUR/USD",
+          "bid": 1.1563,
+          "ask": 1.15647,
+          "bid_rounded": 1.1563,
+          "ask_rounded": 1.15647,
+          "timestamp": 1762776171
+        },
+        {
+          "data_source_id": "GBL",
+          "instrument": "EUR/USD",
+          "bid": 1.18499,
+          "ask": 1.185,
+          "bid_rounded": 1.18499,
+          "ask_rounded": 1.185,
+          "timestamp": 1625112304
+        },
+        {
+          "data_source_id": "GMK",
+          "instrument": "EUR/USD",
+          "bid": 1.15638,
+          "ask": 1.15638,
+          "bid_rounded": 1.15638,
+          "ask_rounded": 1.15638,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "HOT",
+          "instrument": "EUR/USD",
+          "bid": 1.1564,
+          "ask": 1.1564,
+          "bid_rounded": 1.1564,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776162
+        },
+        {
+          "data_source_id": "HYM",
+          "instrument": "EUR/USD",
+          "bid": 1.05726,
+          "ask": 1.05728,
+          "bid_rounded": 1.05726,
+          "ask_rounded": 1.05728,
+          "timestamp": 1696017599
+        },
+        {
+          "data_source_id": "ICM",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15639,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "IFC",
+          "instrument": "EUR/USD",
+          "bid": 1.15638,
+          "ask": 1.15639,
+          "bid_rounded": 1.15638,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "IGM",
+          "instrument": "EUR/USD",
+          "bid": 1.07451,
+          "ask": 1.07457,
+          "bid_rounded": 1.07451,
+          "ask_rounded": 1.07457,
+          "timestamp": 1694491514
+        },
+        {
+          "data_source_id": "IGU",
+          "instrument": "EUR/USD",
+          "bid": 1.15634,
+          "ask": 1.15642,
+          "bid_rounded": 1.15634,
+          "ask_rounded": 1.15642,
+          "timestamp": 1762776156
+        },
+        {
+          "data_source_id": "IRN",
+          "instrument": "EUR/USD",
+          "bid": 1.1564,
+          "ask": 1.1564,
+          "bid_rounded": 1.1564,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776163
+        },
+        {
+          "data_source_id": "IUX",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15639,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776169
+        },
+        {
+          "data_source_id": "J2T",
+          "instrument": "EUR/USD",
+          "bid": 1.1393,
+          "ask": 1.13976,
+          "bid_rounded": 1.1393,
+          "ask_rounded": 1.13976,
+          "timestamp": 1749243519
+        },
+        {
+          "data_source_id": "JMK",
+          "instrument": "EUR/USD",
+          "bid": 1.15636,
+          "ask": 1.15642,
+          "bid_rounded": 1.15636,
+          "ask_rounded": 1.15642,
+          "timestamp": 1762776172
+        },
+        {
+          "data_source_id": "LFX",
+          "instrument": "EUR/USD",
+          "bid": 1.15636,
+          "ask": 1.15644,
+          "bid_rounded": 1.15636,
+          "ask_rounded": 1.15644,
+          "timestamp": 1762776156
+        },
+        {
+          "data_source_id": "LNX",
+          "instrument": "EUR/USD",
+          "bid": 1.06807,
+          "ask": 1.06807,
+          "bid_rounded": 1.06807,
+          "ask_rounded": 1.06807,
+          "timestamp": 1654574709
+        },
+        {
+          "data_source_id": "LTE",
+          "instrument": "EUR/USD",
+          "bid": 1.15638,
+          "ask": 1.15638,
+          "bid_rounded": 1.15638,
+          "ask_rounded": 1.15638,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "MDSAgg",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.1564,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "MEX",
+          "instrument": "EUR/USD",
+          "bid": 1.13928,
+          "ask": 1.13933,
+          "bid_rounded": 1.13928,
+          "ask_rounded": 1.13933,
+          "timestamp": 1749243300
+        },
+        {
+          "data_source_id": "MON",
+          "instrument": "EUR/USD",
+          "bid": 1.1564,
+          "ask": 1.1564,
+          "bid_rounded": 1.1564,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776163
+        },
+        {
+          "data_source_id": "NBH",
+          "instrument": "EUR/USD",
+          "bid": 1.10239,
+          "ask": 1.10245,
+          "bid_rounded": 1.10239,
+          "ask_rounded": 1.10245,
+          "timestamp": 1585713904
+        },
+        {
+          "data_source_id": "OCT",
+          "instrument": "EUR/USD",
+          "bid": 1.15634,
+          "ask": 1.15645,
+          "bid_rounded": 1.15634,
+          "ask_rounded": 1.15645,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "ODA",
+          "instrument": "EUR/USD",
+          "bid": 1.1563,
+          "ask": 1.15647,
+          "bid_rounded": 1.1563,
+          "ask_rounded": 1.15647,
+          "timestamp": 1762776173
+        },
+        {
+          "data_source_id": "ONE",
+          "instrument": "EUR/USD",
+          "bid": 1.15633,
+          "ask": 1.15648,
+          "bid_rounded": 1.15633,
+          "ask_rounded": 1.15648,
+          "timestamp": 1762776163
+        },
+        {
+          "data_source_id": "OQT",
+          "instrument": "EUR/USD",
+          "bid": 1.1564,
+          "ask": 1.1564,
+          "bid_rounded": 1.1564,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "ORB",
+          "instrument": "EUR/USD",
+          "bid": 1.12026,
+          "ask": 1.12029,
+          "bid_rounded": 1.12026,
+          "ask_rounded": 1.12029,
+          "timestamp": 1646111201
+        },
+        {
+          "data_source_id": "PEP",
+          "instrument": "EUR/USD",
+          "bid": 1.1564,
+          "ask": 1.1564,
+          "bid_rounded": 1.1564,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "PUP",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.1564,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "RAK",
+          "instrument": "EUR/USD",
+          "bid": 1.08084,
+          "ask": 1.0809,
+          "bid_rounded": 1.08084,
+          "ask_rounded": 1.0809,
+          "timestamp": 1711140900
+        },
+        {
+          "data_source_id": "RBO",
+          "instrument": "EUR/USD",
+          "bid": 1.10484,
+          "ask": 1.10485,
+          "bid_rounded": 1.10484,
+          "ask_rounded": 1.10485,
+          "timestamp": 1725051295
+        },
+        {
+          "data_source_id": "RFX",
+          "instrument": "EUR/USD",
+          "bid": 1.13513,
+          "ask": 1.13527,
+          "bid_rounded": 1.13513,
+          "ask_rounded": 1.13527,
+          "timestamp": 1562875656
+        },
+        {
+          "data_source_id": "STR",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.1564,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "TDG",
+          "instrument": "EUR/USD",
+          "bid": 1.07013,
+          "ask": 1.07083,
+          "bid_rounded": 1.07013,
+          "ask_rounded": 1.07083,
+          "timestamp": 1672437596
+        },
+        {
+          "data_source_id": "TML",
+          "instrument": "EUR/USD",
+          "bid": 1.1564,
+          "ask": 1.1564,
+          "bid_rounded": 1.1564,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "TMX",
+          "instrument": "EUR/USD",
+          "bid": 1.06356,
+          "ask": 1.06356,
+          "bid_rounded": 1.06356,
+          "ask_rounded": 1.06356,
+          "timestamp": 1713279184
+        },
+        {
+          "data_source_id": "TNK",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15639,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776173
+        },
+        {
+          "data_source_id": "TVM",
+          "instrument": "EUR/USD",
+          "bid": 1.16077,
+          "ask": 1.16086,
+          "bid_rounded": 1.16077,
+          "ask_rounded": 1.16086,
+          "timestamp": 1535749197
+        },
+        {
+          "data_source_id": "VAN",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.15639,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.15639,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "VTM",
+          "instrument": "EUR/USD",
+          "bid": 1.15639,
+          "ask": 1.1564,
+          "bid_rounded": 1.15639,
+          "ask_rounded": 1.1564,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "XEM",
+          "instrument": "EUR/USD",
+          "bid": 1.16604,
+          "ask": 1.16624,
+          "bid_rounded": 1.16604,
+          "ask_rounded": 1.16624,
+          "timestamp": 1754626108
+        },
+        {
+          "data_source_id": "XGT",
+          "instrument": "EUR/USD",
+          "bid": 1.06912,
+          "ask": 1.06933,
+          "bid_rounded": 1.06912,
+          "ask_rounded": 1.06933,
+          "timestamp": 1699419775
+        },
+        {
+          "data_source_id": "ZTD",
+          "instrument": "EUR/USD",
+          "bid": 1.11637,
+          "ask": 1.11736,
+          "bid_rounded": 1.11637,
+          "ask_rounded": 1.11736,
+          "timestamp": 1559832686
+        }
+      ],
+      "base_symbol": "$"
+    },
+    {
+      "instrument": {
+        "id": 14,
+        "name": "GBP/USD",
+        "display_name": "GBP/USD",
+        "instrument_class_name": "Forex",
+        "instrument_class_id": 1,
+        "instrument_prefix": "",
+        "instrument_suffix": "",
+        "site_id": 1,
+        "is_price_adjustments": false,
+        "is_auto_drifting": false,
+        "drift_instrument": null,
+        "decimals": 4,
+        "is_centralized": false,
+        "is_in_holiday": false,
+        "start_holiday_timestamp": null,
+        "next_holiday_timestamp": 1763157600,
+        "end_holiday_timestamp": null
+      },
+      "metrics": {
+        "D2": {
+          "low": 1.31364,
+          "price": 1.3145,
+          "high": 1.31843,
+          "spread": 1.4
+        },
+        "M5": {
+          "low": 1.31754,
+          "price": 1.31769,
+          "high": 1.31774,
+          "spread": 1.4
+        },
+        "H1": {
+          "low": 1.31519,
+          "price": 1.3158,
+          "high": 1.31774,
+          "spread": 1.8
+        },
+        "M25": {
+          "low": 1.31638,
+          "price": 1.31646,
+          "high": 1.31774,
+          "spread": 1.4
+        },
+        "M15": {
+          "low": 1.3168,
+          "price": 1.31697,
+          "high": 1.31774,
+          "spread": 1.4
+        },
+        "H3": {
+          "low": 1.31519,
+          "price": 1.31745,
+          "high": 1.31791,
+          "spread": 2.2
+        },
+        "H5": {
+          "low": 1.31458,
+          "price": 1.31486,
+          "high": 1.31843,
+          "spread": 1.7
+        },
+        "H6": {
+          "low": 1.31389,
+          "price": 1.31566,
+          "high": 1.31843,
+          "spread": 1.5
+        },
+        "H12": {
+          "low": 1.31364,
+          "price": 1.31405,
+          "high": 1.31843,
+          "spread": 1.2
+        },
+        "H4": {
+          "low": 1.31519,
+          "price": 1.31567,
+          "high": 1.31843,
+          "spread": 1.9
+        },
+        "M20": {
+          "low": 1.31665,
+          "price": 1.31682,
+          "high": 1.31774,
+          "spread": 1.4
+        },
+        "M30": {
+          "low": 1.31629,
+          "price": 1.3163,
+          "high": 1.31774,
+          "spread": 1.4
+        },
+        "M10": {
+          "low": 1.31722,
+          "price": 1.3176,
+          "high": 1.31774,
+          "spread": 1.4
+        },
+        "H2": {
+          "low": 1.31519,
+          "price": 1.31718,
+          "high": 1.31774,
+          "spread": 2.9
+        },
+        "D1": {
+          "low": 1.31364,
+          "price": 1.3145,
+          "high": 1.31843,
+          "spread": 1.1
+        }
+      },
+      "quotes": [
+        {
+          "data_source_id": "ACY",
+          "instrument": "GBP/USD",
+          "bid": 1.28977,
+          "ask": 1.28981,
+          "bid_rounded": 1.28977,
+          "ask_rounded": 1.28981,
+          "timestamp": 1730433948
+        },
+        {
+          "data_source_id": "ADM",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31773,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31773,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "AET",
+          "instrument": "GBP/USD",
+          "bid": 1.32726,
+          "ask": 1.32744,
+          "bid_rounded": 1.32726,
+          "ask_rounded": 1.32744,
+          "timestamp": 1527837125
+        },
+        {
+          "data_source_id": "AFT",
+          "instrument": "GBP/USD",
+          "bid": 1.33714,
+          "ask": 1.33715,
+          "bid_rounded": 1.33714,
+          "ask_rounded": 1.33715,
+          "timestamp": 1727755425
+        },
+        {
+          "data_source_id": "ATV",
+          "instrument": "GBP/USD",
+          "bid": 1.31763,
+          "ask": 1.31776,
+          "bid_rounded": 1.31763,
+          "ask_rounded": 1.31776,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "AVA",
+          "instrument": "GBP/USD",
+          "bid": 1.31764,
+          "ask": 1.31776,
+          "bid_rounded": 1.31764,
+          "ask_rounded": 1.31776,
+          "timestamp": 1762776173
+        },
+        {
+          "data_source_id": "AXI",
+          "instrument": "GBP/USD",
+          "bid": 1.3055,
+          "ask": 1.30568,
+          "bid_rounded": 1.3055,
+          "ask_rounded": 1.30568,
+          "timestamp": 1559055785
+        },
+        {
+          "data_source_id": "BBM",
+          "instrument": "GBP/USD",
+          "bid": 1.29341,
+          "ask": 1.29345,
+          "bid_rounded": 1.29341,
+          "ask_rounded": 1.29345,
+          "timestamp": 1743480230
+        },
+        {
+          "data_source_id": "BDS",
+          "instrument": "GBP/USD",
+          "bid": 1.29726,
+          "ask": 1.29742,
+          "bid_rounded": 1.29726,
+          "ask_rounded": 1.29742,
+          "timestamp": 1742304118
+        },
+        {
+          "data_source_id": "CFI",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31771,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31771,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "CMC",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31771,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31771,
+          "timestamp": 1762776172
+        },
+        {
+          "data_source_id": "CPL",
+          "instrument": "GBP/USD",
+          "bid": 1.26776,
+          "ask": 1.26789,
+          "bid_rounded": 1.26776,
+          "ask_rounded": 1.26789,
+          "timestamp": 1706763808
+        },
+        {
+          "data_source_id": "CSP",
+          "instrument": "GBP/USD",
+          "bid": 1.43367,
+          "ask": 1.4339,
+          "bid_rounded": 1.43367,
+          "ask_rounded": 1.4339,
+          "timestamp": 1523913928
+        },
+        {
+          "data_source_id": "DER",
+          "instrument": "GBP/USD",
+          "bid": 1.31764,
+          "ask": 1.31771,
+          "bid_rounded": 1.31764,
+          "ask_rounded": 1.31771,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "EBC",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31768,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31768,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "EIG",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31769,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31769,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "ESY",
+          "instrument": "GBP/USD",
+          "bid": 1.31763,
+          "ask": 1.31776,
+          "bid_rounded": 1.31763,
+          "ask_rounded": 1.31776,
+          "timestamp": 1762776167
+        },
+        {
+          "data_source_id": "ETX",
+          "instrument": "GBP/USD",
+          "bid": 1.30429,
+          "ask": 1.30441,
+          "bid_rounded": 1.30429,
+          "ask_rounded": 1.30441,
+          "timestamp": 1559055785
+        },
+        {
+          "data_source_id": "EXN",
+          "instrument": "GBP/USD",
+          "bid": 1.31762,
+          "ask": 1.31772,
+          "bid_rounded": 1.31762,
+          "ask_rounded": 1.31772,
+          "timestamp": 1762776182
+        },
+        {
+          "data_source_id": "FBS",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31778,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31778,
+          "timestamp": 1762776173
+        },
+        {
+          "data_source_id": "FCM",
+          "instrument": "GBP/USD",
+          "bid": 1.37389,
+          "ask": 1.37403,
+          "bid_rounded": 1.37389,
+          "ask_rounded": 1.37403,
+          "timestamp": 1751342590
+        },
+        {
+          "data_source_id": "FIX",
+          "instrument": "GBP/USD",
+          "bid": 1.31101,
+          "ask": 1.31103,
+          "bid_rounded": 1.31101,
+          "ask_rounded": 1.31103,
+          "timestamp": 1533096295
+        },
+        {
+          "data_source_id": "FOR",
+          "instrument": "GBP/USD",
+          "bid": 1.3177,
+          "ask": 1.3177,
+          "bid_rounded": 1.3177,
+          "ask_rounded": 1.3177,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "FPM",
+          "instrument": "GBP/USD",
+          "bid": 1.31768,
+          "ask": 1.31768,
+          "bid_rounded": 1.31768,
+          "ask_rounded": 1.31768,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "FSN",
+          "instrument": "GBP/USD",
+          "bid": 1.28544,
+          "ask": 1.28547,
+          "bid_rounded": 1.28544,
+          "ask_rounded": 1.28547,
+          "timestamp": 1722485020
+        },
+        {
+          "data_source_id": "FTB",
+          "instrument": "GBP/USD",
+          "bid": 1.29263,
+          "ask": 1.2928,
+          "bid_rounded": 1.29263,
+          "ask_rounded": 1.2928,
+          "timestamp": 1743497493
+        },
+        {
+          "data_source_id": "FXGT",
+          "instrument": "GBP/USD",
+          "bid": 1.28607,
+          "ask": 1.28627,
+          "bid_rounded": 1.28607,
+          "ask_rounded": 1.28627,
+          "timestamp": 1690814006
+        },
+        {
+          "data_source_id": "FXP",
+          "instrument": "GBP/USD",
+          "bid": 1.31763,
+          "ask": 1.31776,
+          "bid_rounded": 1.31763,
+          "ask_rounded": 1.31776,
+          "timestamp": 1762776168
+        },
+        {
+          "data_source_id": "FXT",
+          "instrument": "GBP/USD",
+          "bid": 1.32812,
+          "ask": 1.32816,
+          "bid_rounded": 1.32812,
+          "ask_rounded": 1.32816,
+          "timestamp": 1754330928
+        },
+        {
+          "data_source_id": "FxTrade",
+          "instrument": "GBP/USD",
+          "bid": 1.3176,
+          "ask": 1.31778,
+          "bid_rounded": 1.3176,
+          "ask_rounded": 1.31778,
+          "timestamp": 1762776180
+        },
+        {
+          "data_source_id": "GBL",
+          "instrument": "GBP/USD",
+          "bid": 1.38197,
+          "ask": 1.38203,
+          "bid_rounded": 1.38197,
+          "ask_rounded": 1.38203,
+          "timestamp": 1625112304
+        },
+        {
+          "data_source_id": "GMK",
+          "instrument": "GBP/USD",
+          "bid": 1.31768,
+          "ask": 1.31768,
+          "bid_rounded": 1.31768,
+          "ask_rounded": 1.31768,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "HOT",
+          "instrument": "GBP/USD",
+          "bid": 1.31768,
+          "ask": 1.31768,
+          "bid_rounded": 1.31768,
+          "ask_rounded": 1.31768,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "HYM",
+          "instrument": "GBP/USD",
+          "bid": 1.21997,
+          "ask": 1.22001,
+          "bid_rounded": 1.21997,
+          "ask_rounded": 1.22001,
+          "timestamp": 1696017598
+        },
+        {
+          "data_source_id": "ICM",
+          "instrument": "GBP/USD",
+          "bid": 1.31769,
+          "ask": 1.31769,
+          "bid_rounded": 1.31769,
+          "ask_rounded": 1.31769,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "IFC",
+          "instrument": "GBP/USD",
+          "bid": 1.31768,
+          "ask": 1.3177,
+          "bid_rounded": 1.31768,
+          "ask_rounded": 1.3177,
+          "timestamp": 1762776180
+        },
+        {
+          "data_source_id": "IGM",
+          "instrument": "GBP/USD",
+          "bid": 1.25143,
+          "ask": 1.25152,
+          "bid_rounded": 1.25143,
+          "ask_rounded": 1.25152,
+          "timestamp": 1694491508
+        },
+        {
+          "data_source_id": "IGU",
+          "instrument": "GBP/USD",
+          "bid": 1.31766,
+          "ask": 1.31776,
+          "bid_rounded": 1.31766,
+          "ask_rounded": 1.31776,
+          "timestamp": 1762776167
+        },
+        {
+          "data_source_id": "IRN",
+          "instrument": "GBP/USD",
+          "bid": 1.31769,
+          "ask": 1.31769,
+          "bid_rounded": 1.31769,
+          "ask_rounded": 1.31769,
+          "timestamp": 1762776167
+        },
+        {
+          "data_source_id": "IUX",
+          "instrument": "GBP/USD",
+          "bid": 1.31771,
+          "ask": 1.31771,
+          "bid_rounded": 1.31771,
+          "ask_rounded": 1.31771,
+          "timestamp": 1762776178
+        },
+        {
+          "data_source_id": "J2T",
+          "instrument": "GBP/USD",
+          "bid": 1.35242,
+          "ask": 1.35286,
+          "bid_rounded": 1.35242,
+          "ask_rounded": 1.35286,
+          "timestamp": 1749243497
+        },
+        {
+          "data_source_id": "JMK",
+          "instrument": "GBP/USD",
+          "bid": 1.31765,
+          "ask": 1.31772,
+          "bid_rounded": 1.31765,
+          "ask_rounded": 1.31772,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "LFX",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31772,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31772,
+          "timestamp": 1762776180
+        },
+        {
+          "data_source_id": "LNX",
+          "instrument": "GBP/USD",
+          "bid": 1.2506,
+          "ask": 1.25063,
+          "bid_rounded": 1.2506,
+          "ask_rounded": 1.25063,
+          "timestamp": 1654574716
+        },
+        {
+          "data_source_id": "LTE",
+          "instrument": "GBP/USD",
+          "bid": 1.31769,
+          "ask": 1.31769,
+          "bid_rounded": 1.31769,
+          "ask_rounded": 1.31769,
+          "timestamp": 1762776167
+        },
+        {
+          "data_source_id": "MDSAgg",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31771,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31771,
+          "timestamp": 1762776178
+        },
+        {
+          "data_source_id": "MEX",
+          "instrument": "GBP/USD",
+          "bid": 1.35256,
+          "ask": 1.3527,
+          "bid_rounded": 1.35256,
+          "ask_rounded": 1.3527,
+          "timestamp": 1749243300
+        },
+        {
+          "data_source_id": "MON",
+          "instrument": "GBP/USD",
+          "bid": 1.31768,
+          "ask": 1.31768,
+          "bid_rounded": 1.31768,
+          "ask_rounded": 1.31768,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "NBH",
+          "instrument": "GBP/USD",
+          "bid": 1.2383,
+          "ask": 1.23849,
+          "bid_rounded": 1.2383,
+          "ask_rounded": 1.23849,
+          "timestamp": 1585713905
+        },
+        {
+          "data_source_id": "OCT",
+          "instrument": "GBP/USD",
+          "bid": 1.3176,
+          "ask": 1.31779,
+          "bid_rounded": 1.3176,
+          "ask_rounded": 1.31779,
+          "timestamp": 1762776177
+        },
+        {
+          "data_source_id": "ODA",
+          "instrument": "GBP/USD",
+          "bid": 1.3176,
+          "ask": 1.31779,
+          "bid_rounded": 1.3176,
+          "ask_rounded": 1.31779,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "ONE",
+          "instrument": "GBP/USD",
+          "bid": 1.31762,
+          "ask": 1.31777,
+          "bid_rounded": 1.31762,
+          "ask_rounded": 1.31777,
+          "timestamp": 1762776167
+        },
+        {
+          "data_source_id": "OQT",
+          "instrument": "GBP/USD",
+          "bid": 1.3177,
+          "ask": 1.3177,
+          "bid_rounded": 1.3177,
+          "ask_rounded": 1.3177,
+          "timestamp": 1762776167
+        },
+        {
+          "data_source_id": "ORB",
+          "instrument": "GBP/USD",
+          "bid": 1.34164,
+          "ask": 1.34169,
+          "bid_rounded": 1.34164,
+          "ask_rounded": 1.34169,
+          "timestamp": 1646111205
+        },
+        {
+          "data_source_id": "PEP",
+          "instrument": "GBP/USD",
+          "bid": 1.3177,
+          "ask": 1.3177,
+          "bid_rounded": 1.3177,
+          "ask_rounded": 1.3177,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "PUP",
+          "instrument": "GBP/USD",
+          "bid": 1.31768,
+          "ask": 1.31768,
+          "bid_rounded": 1.31768,
+          "ask_rounded": 1.31768,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "RAK",
+          "instrument": "GBP/USD",
+          "bid": 1.25994,
+          "ask": 1.26006,
+          "bid_rounded": 1.25994,
+          "ask_rounded": 1.26006,
+          "timestamp": 1711140900
+        },
+        {
+          "data_source_id": "RBO",
+          "instrument": "GBP/USD",
+          "bid": 1.31294,
+          "ask": 1.31305,
+          "bid_rounded": 1.31294,
+          "ask_rounded": 1.31305,
+          "timestamp": 1725051248
+        },
+        {
+          "data_source_id": "RFX",
+          "instrument": "GBP/USD",
+          "bid": 1.26975,
+          "ask": 1.26992,
+          "bid_rounded": 1.26975,
+          "ask_rounded": 1.26992,
+          "timestamp": 1562875661
+        },
+        {
+          "data_source_id": "STR",
+          "instrument": "GBP/USD",
+          "bid": 1.31769,
+          "ask": 1.3177,
+          "bid_rounded": 1.31769,
+          "ask_rounded": 1.3177,
+          "timestamp": 1762776181
+        },
+        {
+          "data_source_id": "TDG",
+          "instrument": "GBP/USD",
+          "bid": 1.20938,
+          "ask": 1.2105,
+          "bid_rounded": 1.20938,
+          "ask_rounded": 1.2105,
+          "timestamp": 1672437595
+        },
+        {
+          "data_source_id": "TML",
+          "instrument": "GBP/USD",
+          "bid": 1.31769,
+          "ask": 1.31769,
+          "bid_rounded": 1.31769,
+          "ask_rounded": 1.31769,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "TMX",
+          "instrument": "GBP/USD",
+          "bid": 1.24481,
+          "ask": 1.24481,
+          "bid_rounded": 1.24481,
+          "ask_rounded": 1.24481,
+          "timestamp": 1713279185
+        },
+        {
+          "data_source_id": "TNK",
+          "instrument": "GBP/USD",
+          "bid": 1.31767,
+          "ask": 1.31771,
+          "bid_rounded": 1.31767,
+          "ask_rounded": 1.31771,
+          "timestamp": 1762776173
+        },
+        {
+          "data_source_id": "TVM",
+          "instrument": "GBP/USD",
+          "bid": 1.29579,
+          "ask": 1.29594,
+          "bid_rounded": 1.29579,
+          "ask_rounded": 1.29594,
+          "timestamp": 1535749197
+        },
+        {
+          "data_source_id": "VAN",
+          "instrument": "GBP/USD",
+          "bid": 1.31768,
+          "ask": 1.3177,
+          "bid_rounded": 1.31768,
+          "ask_rounded": 1.3177,
+          "timestamp": 1762776179
+        },
+        {
+          "data_source_id": "VTM",
+          "instrument": "GBP/USD",
+          "bid": 1.31769,
+          "ask": 1.3177,
+          "bid_rounded": 1.31769,
+          "ask_rounded": 1.3177,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "XEM",
+          "instrument": "GBP/USD",
+          "bid": 1.34381,
+          "ask": 1.34405,
+          "bid_rounded": 1.34381,
+          "ask_rounded": 1.34405,
+          "timestamp": 1754626104
+        },
+        {
+          "data_source_id": "XGT",
+          "instrument": "GBP/USD",
+          "bid": 1.22824,
+          "ask": 1.22849,
+          "bid_rounded": 1.22824,
+          "ask_rounded": 1.22849,
+          "timestamp": 1699419798
+        },
+        {
+          "data_source_id": "ZTD",
+          "instrument": "GBP/USD",
+          "bid": 1.26219,
+          "ask": 1.2636,
+          "bid_rounded": 1.26219,
+          "ask_rounded": 1.2636,
+          "timestamp": 1559832860
+        }
+      ],
+      "base_symbol": "$"
+    },
+    {
+      "instrument": {
+        "id": 201,
+        "name": "Gold/USD",
+        "display_name": "Gold/USD",
+        "instrument_class_name": "Metal",
+        "instrument_class_id": 4,
+        "instrument_prefix": "",
+        "instrument_suffix": " ozt",
+        "site_id": 2,
+        "is_price_adjustments": true,
+        "is_auto_drifting": false,
+        "drift_instrument": "AUD/USD",
+        "decimals": 1,
+        "is_centralized": false,
+        "is_in_holiday": false,
+        "start_holiday_timestamp": null,
+        "next_holiday_timestamp": 1763157600,
+        "end_holiday_timestamp": null
+      },
+      "metrics": {
+        "M15": {
+          "low": 4081.02,
+          "price": 4082.42,
+          "high": 4088.2,
+          "spread": 3
+        },
+        "H1": {
+          "low": 4075.73,
+          "price": 4080.87,
+          "high": 4088.2,
+          "spread": 2.4
+        },
+        "D1": {
+          "low": 3997.8,
+          "price": 4000.71,
+          "high": 4088.2,
+          "spread": 2.7
+        },
+        "M5": {
+          "low": 4082.38,
+          "price": 4083.61,
+          "high": 4088.2,
+          "spread": 2.9
+        },
+        "M25": {
+          "low": 4080.81,
+          "price": 4081.41,
+          "high": 4088.2,
+          "spread": 3
+        },
+        "D2": {
+          "low": 3997.8,
+          "price": 4000.71,
+          "high": 4088.2,
+          "spread": 2.6
+        },
+        "M30": {
+          "low": 4079.55,
+          "price": 4080.37,
+          "high": 4088.2,
+          "spread": 3
+        },
+        "H4": {
+          "low": 4071.5,
+          "price": 4076.46,
+          "high": 4088.2,
+          "spread": 2.2
+        },
+        "H6": {
+          "low": 4066.98,
+          "price": 4068.14,
+          "high": 4088.2,
+          "spread": 2.4
+        },
+        "M20": {
+          "low": 4080.87,
+          "price": 4083.41,
+          "high": 4088.2,
+          "spread": 3
+        },
+        "H12": {
+          "low": 4011.02,
+          "price": 4016.4,
+          "high": 4088.2,
+          "spread": 2.6
+        },
+        "M10": {
+          "low": 4081.02,
+          "price": 4081.12,
+          "high": 4088.2,
+          "spread": 3
+        },
+        "H3": {
+          "low": 4071.5,
+          "price": 4079.1,
+          "high": 4088.2,
+          "spread": 2
+        },
+        "H5": {
+          "low": 4071.5,
+          "price": 4075.94,
+          "high": 4088.2,
+          "spread": 2.4
+        },
+        "H2": {
+          "low": 4075.73,
+          "price": 4080.6,
+          "high": 4088.2,
+          "spread": 1.6
+        }
+      },
+      "quotes": [
+        {
+          "data_source_id": "ADM",
+          "instrument": "Gold/USD",
+          "bid": 1286.79004,
+          "ask": 1287,
+          "bid_rounded": 1286.79,
+          "ask_rounded": 1287,
+          "timestamp": 1551815644
+        },
+        {
+          "data_source_id": "AET",
+          "instrument": "Gold/USD",
+          "bid": 1847.48,
+          "ask": 1847.72,
+          "bid_rounded": 1847.48,
+          "ask_rounded": 1847.72,
+          "timestamp": 1611957300
+        },
+        {
+          "data_source_id": "ATV",
+          "instrument": "Gold/USD",
+          "bid": 4086.91,
+          "ask": 4087.4,
+          "bid_rounded": 4086.91,
+          "ask_rounded": 4087.4,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "ATVMT4",
+          "instrument": "Gold/USD",
+          "bid": 4086.88,
+          "ask": 4087.37,
+          "bid_rounded": 4086.88,
+          "ask_rounded": 4087.37,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "AXI",
+          "instrument": "Gold/USD",
+          "bid": 1910.38,
+          "ask": 1910.76001,
+          "bid_rounded": 1910.38,
+          "ask_rounded": 1910.76,
+          "timestamp": 1601966050
+        },
+        {
+          "data_source_id": "BDS",
+          "instrument": "Gold/USD",
+          "bid": 3035.8,
+          "ask": 3036.4,
+          "bid_rounded": 3035.8,
+          "ask_rounded": 3036.4,
+          "timestamp": 1742304126
+        },
+        {
+          "data_source_id": "CSP",
+          "instrument": "Gold/USD",
+          "bid": 1290.6296605,
+          "ask": 1291.4996505,
+          "bid_rounded": 1290.63,
+          "ask_rounded": 1291.5,
+          "timestamp": 1526504382
+        },
+        {
+          "data_source_id": "DER",
+          "instrument": "Gold/USD",
+          "bid": 4087.03,
+          "ask": 4087.25,
+          "bid_rounded": 4087.03,
+          "ask_rounded": 4087.25,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "EIG",
+          "instrument": "Gold/USD",
+          "bid": 4087.13,
+          "ask": 4087.27,
+          "bid_rounded": 4087.13,
+          "ask_rounded": 4087.27,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "ESY",
+          "instrument": "Gold/USD",
+          "bid": 4087.06,
+          "ask": 4087.41,
+          "bid_rounded": 4087.06,
+          "ask_rounded": 4087.41,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "EVR",
+          "instrument": "Gold/USD",
+          "bid": 1853.69,
+          "ask": 1853.9,
+          "bid_rounded": 1853.69,
+          "ask_rounded": 1853.9,
+          "timestamp": 1610566920
+        },
+        {
+          "data_source_id": "EXN",
+          "instrument": "Gold/USD",
+          "bid": 1291.0256505,
+          "ask": 1291.2065605,
+          "bid_rounded": 1291.03,
+          "ask_rounded": 1291.21,
+          "timestamp": 1526504340
+        },
+        {
+          "data_source_id": "FBO",
+          "instrument": "Gold/USD",
+          "bid": 1290.9195805,
+          "ask": 1291.1595705,
+          "bid_rounded": 1290.92,
+          "ask_rounded": 1291.16,
+          "timestamp": 1526504118
+        },
+        {
+          "data_source_id": "FBS",
+          "instrument": "Gold/USD",
+          "bid": 4086.98,
+          "ask": 4087.37,
+          "bid_rounded": 4086.98,
+          "ask_rounded": 4087.37,
+          "timestamp": 1762776185
+        },
+        {
+          "data_source_id": "FIX",
+          "instrument": "Gold/USD",
+          "bid": -0.2182552500000156,
+          "ask": -0.2182552500000156,
+          "bid_rounded": -0.22,
+          "ask_rounded": -0.22,
+          "timestamp": 1529507182
+        },
+        {
+          "data_source_id": "FPM",
+          "instrument": "Gold/USD",
+          "bid": 4087.12,
+          "ask": 4087.19,
+          "bid_rounded": 4087.12,
+          "ask_rounded": 4087.19,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "FXC",
+          "instrument": "Gold/USD",
+          "bid": 1193.15002,
+          "ask": 1193.47998,
+          "bid_rounded": 1193.15,
+          "ask_rounded": 1193.48,
+          "timestamp": 1536735884
+        },
+        {
+          "data_source_id": "FXP",
+          "instrument": "Gold/USD",
+          "bid": 4087.04,
+          "ask": 4087.35,
+          "bid_rounded": 4087.04,
+          "ask_rounded": 4087.35,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "FXT",
+          "instrument": "Gold/USD",
+          "bid": 1339.61813139,
+          "ask": 1339.61813139,
+          "bid_rounded": 1339.62,
+          "ask_rounded": 1339.62,
+          "timestamp": 1523398822
+        },
+        {
+          "data_source_id": "GMK",
+          "instrument": "Gold/USD",
+          "bid": 4087.27,
+          "ask": 4087.4,
+          "bid_rounded": 4087.27,
+          "ask_rounded": 4087.4,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "HOT",
+          "instrument": "Gold/USD",
+          "bid": 4087.27,
+          "ask": 4087.35,
+          "bid_rounded": 4087.27,
+          "ask_rounded": 4087.35,
+          "timestamp": 1762776182
+        },
+        {
+          "data_source_id": "ICM",
+          "instrument": "Gold/USD",
+          "bid": 4087.19,
+          "ask": 4087.24,
+          "bid_rounded": 4087.19,
+          "ask_rounded": 4087.24,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "IFC",
+          "instrument": "Gold/USD",
+          "bid": 2625.99,
+          "ask": 2626.57,
+          "bid_rounded": 2625.99,
+          "ask_rounded": 2626.57,
+          "timestamp": 1733422600
+        },
+        {
+          "data_source_id": "IFCMT4",
+          "instrument": "Gold/USD",
+          "bid": 4086.65,
+          "ask": 4087.1,
+          "bid_rounded": 4086.65,
+          "ask_rounded": 4087.1,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "IGM",
+          "instrument": "Gold/USD",
+          "bid": 1644.27,
+          "ask": 1644.77,
+          "bid_rounded": 1644.27,
+          "ask_rounded": 1644.77,
+          "timestamp": 1666990741
+        },
+        {
+          "data_source_id": "IRN",
+          "instrument": "Gold/USD",
+          "bid": 4087.16,
+          "ask": 4087.29,
+          "bid_rounded": 4087.16,
+          "ask_rounded": 4087.29,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "IUX",
+          "instrument": "Gold/USD",
+          "bid": 4087.09,
+          "ask": 4087.11,
+          "bid_rounded": 4087.09,
+          "ask_rounded": 4087.11,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "JMK",
+          "instrument": "Gold/USD",
+          "bid": 4087.26,
+          "ask": 4087.37,
+          "bid_rounded": 4087.26,
+          "ask_rounded": 4087.37,
+          "timestamp": 1762776182
+        },
+        {
+          "data_source_id": "LCG",
+          "instrument": "Gold/USD",
+          "bid": 1314.2506515,
+          "ask": 1314.5706014999998,
+          "bid_rounded": 1314.25,
+          "ask_rounded": 1314.57,
+          "timestamp": 1525725480
+        },
+        {
+          "data_source_id": "LFX",
+          "instrument": "Gold/USD",
+          "bid": 4087.06,
+          "ask": 4087.16,
+          "bid_rounded": 4087.06,
+          "ask_rounded": 4087.16,
+          "timestamp": 1762776185
+        },
+        {
+          "data_source_id": "LTE",
+          "instrument": "Gold/USD",
+          "bid": 4086.95,
+          "ask": 4087.17,
+          "bid_rounded": 4086.95,
+          "ask_rounded": 4087.17,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "MDSAgg",
+          "instrument": "Gold/USD",
+          "bid": 4086.973,
+          "ask": 4087.123,
+          "bid_rounded": 4086.97,
+          "ask_rounded": 4087.12,
+          "timestamp": 1762776185
+        },
+        {
+          "data_source_id": "MON",
+          "instrument": "Gold/USD",
+          "bid": 4087.16,
+          "ask": 4087.23,
+          "bid_rounded": 4087.16,
+          "ask_rounded": 4087.23,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "OCT",
+          "instrument": "Gold/USD",
+          "bid": 4086.94,
+          "ask": 4087.29,
+          "bid_rounded": 4086.94,
+          "ask_rounded": 4087.29,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "ONE",
+          "instrument": "Gold/USD",
+          "bid": 4087.15,
+          "ask": 4087.37,
+          "bid_rounded": 4087.15,
+          "ask_rounded": 4087.37,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "OQT",
+          "instrument": "Gold/USD",
+          "bid": 4087.17,
+          "ask": 4087.26,
+          "bid_rounded": 4087.17,
+          "ask_rounded": 4087.26,
+          "timestamp": 1762776185
+        },
+        {
+          "data_source_id": "ORB",
+          "instrument": "Gold/USD",
+          "bid": 1286.81995,
+          "ask": 1287.03003,
+          "bid_rounded": 1286.82,
+          "ask_rounded": 1287.03,
+          "timestamp": 1551815570
+        },
+        {
+          "data_source_id": "PEP",
+          "instrument": "Gold/USD",
+          "bid": 4087.22,
+          "ask": 4087.44,
+          "bid_rounded": 4087.22,
+          "ask_rounded": 4087.44,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "PUP",
+          "instrument": "Gold/USD",
+          "bid": 4087.18,
+          "ask": 4087.27,
+          "bid_rounded": 4087.18,
+          "ask_rounded": 4087.27,
+          "timestamp": 1762776183
+        },
+        {
+          "data_source_id": "RAK",
+          "instrument": "Gold/USD",
+          "bid": 1286.75,
+          "ask": 1286.90002,
+          "bid_rounded": 1286.75,
+          "ask_rounded": 1286.9,
+          "timestamp": 1551815473
+        },
+        {
+          "data_source_id": "RFX",
+          "instrument": "Gold/USD",
+          "bid": 1213.8941156666667,
+          "ask": 1214.1940456666666,
+          "bid_rounded": 1213.89,
+          "ask_rounded": 1214.19,
+          "timestamp": 1533300085
+        },
+        {
+          "data_source_id": "STR",
+          "instrument": "Gold/USD",
+          "bid": 4087.19,
+          "ask": 4087.25,
+          "bid_rounded": 4087.19,
+          "ask_rounded": 4087.25,
+          "timestamp": 1762776185
+        },
+        {
+          "data_source_id": "SWQ",
+          "instrument": "Gold/USD",
+          "bid": 1290.9916005,
+          "ask": 1291.3365704999999,
+          "bid_rounded": 1290.99,
+          "ask_rounded": 1291.34,
+          "timestamp": 1526504281
+        },
+        {
+          "data_source_id": "TML",
+          "instrument": "Gold/USD",
+          "bid": 4086.94,
+          "ask": 4087,
+          "bid_rounded": 4086.94,
+          "ask_rounded": 4087,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "TNK",
+          "instrument": "Gold/USD",
+          "bid": 1290.6795905,
+          "ask": 1291.3396205,
+          "bid_rounded": 1290.68,
+          "ask_rounded": 1291.34,
+          "timestamp": 1526504369
+        },
+        {
+          "data_source_id": "TVM",
+          "instrument": "Gold/USD",
+          "bid": 1191.68005,
+          "ask": 1191.93005,
+          "bid_rounded": 1191.68,
+          "ask_rounded": 1191.93,
+          "timestamp": 1538168096
+        },
+        {
+          "data_source_id": "VAN",
+          "instrument": "Gold/USD",
+          "bid": 4087.18,
+          "ask": 4087.26,
+          "bid_rounded": 4087.18,
+          "ask_rounded": 4087.26,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "VTM",
+          "instrument": "Gold/USD",
+          "bid": 4087.03,
+          "ask": 4087.28,
+          "bid_rounded": 4087.03,
+          "ask_rounded": 4087.28,
+          "timestamp": 1762776184
+        },
+        {
+          "data_source_id": "XEM",
+          "instrument": "Gold/USD",
+          "bid": 3396.75,
+          "ask": 3397.15,
+          "bid_rounded": 3396.75,
+          "ask_rounded": 3397.15,
+          "timestamp": 1754626110
+        }
+      ],
+      "base_symbol": "$"
+    }
+  ]
+}

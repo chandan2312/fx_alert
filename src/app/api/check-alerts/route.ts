@@ -12,7 +12,13 @@ const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID
 const API_URL = 'https://mds-api.forexfactory.com/instruments'
 
 // Fetch live prices from Forex Factory
-async function fetchLivePrices(instruments: string[]): Promise<Record<string, number>> {
+interface PriceData {
+  price: number
+  high: number
+  low: number
+}
+
+async function fetchLivePrices(instruments: string[]): Promise<Record<string, PriceData>> {
   try {
     const instrumentsParam = instruments.join(',')
     const url = `${API_URL}?instruments=${instrumentsParam}`
@@ -29,13 +35,17 @@ async function fetchLivePrices(instruments: string[]): Promise<Record<string, nu
     }
     
     const data = await response.json()
-    const prices: Record<string, number> = {}
+    const prices: Record<string, PriceData> = {}
     
     if (data.data && Array.isArray(data.data)) {
       data.data.forEach((item: any) => {
-        if (item.instrument && item.metrics && item.metrics.M20) {
-          const metric = item.metrics.M20
-          prices[item.instrument.name] = metric.price
+        if (item.instrument && item.metrics && item.metrics.M5) {
+          const metric = item.metrics.M5
+          prices[item.instrument.name] = {
+            price: metric.price,
+            high: metric.high,
+            low: metric.low
+          }
         }
       })
     }
@@ -114,31 +124,38 @@ export async function GET() {
     
     for (const alert of activeAlerts) {
       const apiSymbolKey = alert.api_symbol.replace('%2F', '/')
-      const currentPrice = livePrices[apiSymbolKey]
+      const priceData = livePrices[apiSymbolKey]
       
-      if (!currentPrice) {
+      if (!priceData) {
         console.log(`⚠️  No price data for ${alert.symbol}`)
         continue
       }
       
       let isTriggered = false
       
-      if (alert.type === 'crossing_up' && currentPrice >= alert.price) {
-        isTriggered = true
-      } else if (alert.type === 'crossing_down' && currentPrice <= alert.price) {
-        isTriggered = true
+      // Check alert using current price AND recent high/low (M5 = last 5 min)
+      if (alert.type === 'crossing_up') {
+        // For crossing up: check if current price OR recent high touched/exceeded alert price
+        if (priceData.price >= alert.price || priceData.high >= alert.price) {
+          isTriggered = true
+        }
+      } else if (alert.type === 'crossing_down') {
+        // For crossing down: check if current price OR recent low touched/went below alert price
+        if (priceData.price <= alert.price || priceData.low <= alert.price) {
+          isTriggered = true
+        }
       }
       
       if (isTriggered) {
-        triggeredAlerts.push({ alert, currentPrice })
-        console.log(`🎯 Alert triggered! ${alert.symbol} - ${alert.type} @ ${alert.price}`)
+        triggeredAlerts.push({ alert, currentPrice: priceData.price, high: priceData.high, low: priceData.low })
+        console.log(`🎯 Alert triggered! ${alert.symbol} - ${alert.type} @ ${alert.price} (Current: ${priceData.price}, High: ${priceData.high}, Low: ${priceData.low})`)
       }
     }
     
     // Update triggered alerts and send notifications
     const results = []
     
-    for (const { alert, currentPrice } of triggeredAlerts) {
+    for (const { alert, currentPrice, high, low } of triggeredAlerts) {
       try {
         // Update alert status in database
         await prisma.alert.update({
