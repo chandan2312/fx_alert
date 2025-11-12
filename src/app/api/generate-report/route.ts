@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import puppeteer from 'puppeteer'
 import { GoogleGenAI } from '@google/genai'
-import Jimp from 'jimp'
+import { Jimp } from 'jimp'
 import prompts from '@/config/report-prompts'
 
 export const dynamic = 'force-dynamic'
@@ -136,8 +136,34 @@ export async function POST(request: Request) {
       const ovSmc = parseBlock(raw.smc)
       const ovSr = parseBlock(raw.sr)
       const image = await Jimp.read(Buffer.from(base64, 'base64'))
-      const W = image.getWidth()
-      const H = image.getHeight()
+      const W = image.width
+      const H = image.height
+
+      const rgbaToInt = (r: number, g: number, b: number, a: number) => {
+        return (((a & 255) << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255)) >>> 0
+      }
+
+      const toColor = (color: string) => {
+        const c = color.trim().toLowerCase()
+        const hexMatch = c.match(/^#([0-9a-f]{6})([0-9a-f]{2})?$/i)
+        if (hexMatch) {
+          const hex = hexMatch[1]
+          const r = parseInt(hex.slice(0, 2), 16)
+          const g = parseInt(hex.slice(2, 4), 16)
+          const b = parseInt(hex.slice(4, 6), 16)
+          const a = hexMatch[2] ? parseInt(hexMatch[2], 16) : 255
+          return rgbaToInt(r, g, b, a)
+        }
+        const rgbMatch = c.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/)
+        if (rgbMatch) {
+          const r = parseInt(rgbMatch[1], 10)
+          const g = parseInt(rgbMatch[2], 10)
+          const b = parseInt(rgbMatch[3], 10)
+          const a = rgbMatch[4] ? Math.round(parseFloat(rgbMatch[4]) * 255) : 255
+          return rgbaToInt(r, g, b, a)
+        }
+        return rgbaToInt(255, 204, 0, 255)
+      }
 
       const drawLine = (p1: any, p2: any, color: string, width: number) => {
         const x1 = Math.round(p1.x * W), y1 = Math.round(p1.y * H)
@@ -150,7 +176,7 @@ export async function POST(request: Request) {
         for (;;) {
           for (let i = -Math.floor(width/2); i <= Math.floor(width/2); i++) {
             for (let j = -Math.floor(width/2); j <= Math.floor(width/2); j++) {
-              image.setPixelColor(Jimp.cssColorToHex(color), x + i, y + j)
+              image.setPixelColor(toColor(color), x + i, y + j)
             }
           }
           if (x === x2 && y === y2) break
@@ -165,25 +191,26 @@ export async function POST(request: Request) {
         const w = Math.round(rect.w * W), h = Math.round(rect.h * H)
         for (let i = 0; i < w; i++) {
           for (let t = 0; t < width; t++) {
-            image.setPixelColor(Jimp.cssColorToHex(color), x + i, y + t)
-            image.setPixelColor(Jimp.cssColorToHex(color), x + i, y + h - 1 - t)
+            image.setPixelColor(toColor(color), x + i, y + t)
+            image.setPixelColor(toColor(color), x + i, y + h - 1 - t)
           }
         }
         for (let i = 0; i < h; i++) {
           for (let t = 0; t < width; t++) {
-            image.setPixelColor(Jimp.cssColorToHex(color), x + t, y + i)
-            image.setPixelColor(Jimp.cssColorToHex(color), x + w - 1 - t, y + i)
+            image.setPixelColor(toColor(color), x + t, y + i)
+            image.setPixelColor(toColor(color), x + w - 1 - t, y + i)
           }
         }
       }
 
       const drawLabel = async (pt: any, text: string, color: string) => {
         const x = Math.round(pt.x * W), y = Math.round(pt.y * H)
-        const font = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE)
-        const bg = Jimp.cssColorToHex(color)
-        const label = new Jimp(200, 24, 0x00000080)
-        image.composite(label, x, y)
-        image.print(font, x + 6, y + 4, text)
+        const col = toColor(color)
+        for (let i = -2; i <= 2; i++) {
+          for (let j = -2; j <= 2; j++) {
+            image.setPixelColor(col, x + i, y + j)
+          }
+        }
       }
 
       const apply = async (items: any[]) => {
@@ -215,8 +242,13 @@ export async function POST(request: Request) {
       await applyWithColor(ovSmc.smc || ovSmc.items || [], colorSmc)
       await applyWithColor(ovSr.sr || ovSr.items || [], colorSr)
 
-      const outBuf = await image.getBufferAsync(Jimp.MIME_PNG)
-      annotatedBase64 = outBuf.toString('base64')
+      const out64: string = await new Promise((resolve, reject) => {
+        image.getBase64('image/png', (err: any, val: string) => {
+          if (err) reject(err)
+          else resolve(val)
+        })
+      })
+      annotatedBase64 = String(out64).replace(/^data:image\/png;base64,/, '')
     } catch {
       annotatedBase64 = base64
     }
