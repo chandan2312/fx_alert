@@ -82,6 +82,7 @@ export default function Home() {
   const [biasSheetData, setBiasSheetData] = useState<Record<string, any>>({})
   const [focusMode, setFocusMode] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [selectedSymbolValue, setSelectedSymbolValue] = useState<string>(() => symbols[0]?.value || '')
 
   // Load symbol order from localStorage on mount
   useEffect(() => {
@@ -175,14 +176,25 @@ export default function Home() {
           fetch('/api/alerts?status=active'),
           fetch('/api/alerts?status=triggered')
         ])
-        
-        const activeAlerts: DbAlert[] = await activeRes.json()
-        const triggeredAlerts: DbAlert[] = await triggeredRes.json()
-        
+
+        let activeAlerts: DbAlert[] = []
+        let triggeredAlerts: DbAlert[] = []
+
+        if (activeRes.ok) {
+          const json = await activeRes.json()
+          activeAlerts = Array.isArray(json) ? json : []
+        }
+        if (triggeredRes.ok) {
+          const json = await triggeredRes.json()
+          triggeredAlerts = Array.isArray(json) ? json : []
+        }
+
         setActiveDbAlerts(activeAlerts)
         setTriggeredDbAlerts(triggeredAlerts)
       } catch (error) {
         console.error('Error fetching alerts:', error)
+        setActiveDbAlerts([])
+        setTriggeredDbAlerts([])
       }
     }
     
@@ -558,6 +570,50 @@ export default function Home() {
     })
   }, [symbols, focusMode])
 
+  const selectedSymbol = useMemo(() => {
+    return sortedSymbols.find(s => s.value === selectedSymbolValue) || sortedSymbols[0]
+  }, [sortedSymbols, selectedSymbolValue])
+
+  const selectedAlerts = useMemo(() => {
+    return selectedSymbol ? getAlertsForSymbol(selectedSymbol.value) : []
+  }, [selectedSymbol, symbolAlerts])
+
+  const selectedLivePrice = useMemo(() => {
+    return selectedSymbol ? getLivePrice(selectedSymbol.api_symbol) : null
+  }, [selectedSymbol, livePrices])
+
+  const [reportLoading, setReportLoading] = useState(false)
+  const [reportResults, setReportResults] = useState<{structure?: string; smc?: string; sr?: string; image?: string | null} | null>(null)
+  const [reportError, setReportError] = useState<string>('')
+
+  const generateReport = async () => {
+    if (!selectedSymbol) return
+    setReportLoading(true)
+    setReportError('')
+    setReportResults(null)
+    try {
+      const res = await fetch('/api/generate-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol: selectedSymbol.value, darkMode })
+      })
+      if (!res.ok) {
+        let msg = 'Failed to generate report'
+        try {
+          const err = await res.json()
+          if (err?.error) msg = err.error
+        } catch {}
+        throw new Error(msg)
+      }
+      const data = await res.json()
+      setReportResults(data)
+    } catch (e: any) {
+      setReportError(e.message || 'Error generating report')
+    } finally {
+      setReportLoading(false)
+    }
+  }
+
   const labelColors: Record<SymbolLabel, string> = {
     Live: 'bg-red-100 text-red-800 border-red-300',
     Super: 'bg-purple-100 text-purple-800 border-purple-300',
@@ -834,344 +890,145 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content with top padding for fixed header */}
       <div className="flex flex-1 overflow-hidden mt-14">
         <div className="flex-1 overflow-y-auto p-2 md:p-4 main-scroll-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {sortedSymbols.map((symbol, index) => {
-              const category = symbol.category || 'Other'
-              const alerts = getAlertsForSymbol(symbol.value)
-              const livePrice = getLivePrice(symbol.api_symbol)
-              
-              return (
-                <div 
-                  id={`symbol-${symbol.value}`}
-                  key={symbol.value}
-                  data-index={index}
-                  className={`symbol-card bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all ${
-                    draggedIndex === index ? 'opacity-50 scale-95 ring-2 ring-blue-500' : 'opacity-100 scale-100'
-                  } hover:shadow-lg`}
-                  draggable={!isMobile}
-                  onDragStart={!isMobile ? (e) => handleDragStart(e, index) : undefined}
-                  onDragEnd={!isMobile ? handleDragEnd : undefined}
-                  onDragOver={!isMobile ? handleDragOver : undefined}
-                  onDrop={!isMobile ? (e) => handleDrop(e, index) : undefined}
-                >
-                  <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
-                    {/* Mobile Layout: Compact design with collapsible section */}
-                    <div className="md:hidden">
-                      {/* Row 1: Symbol name, price, and status with collapse toggle */}
-                      <div className="flex items-center justify-between mb-2 gap-2">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <button 
-                            onClick={() => setExpandedSymbols(prev => ({ ...prev, [symbol.value]: !prev[symbol.value] }))}
-                            className="p-1 mr-1"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 text-gray-500 transition-transform ${expandedSymbols[symbol.value] ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
-                          <h2 className="text-base font-semibold text-gray-800 dark:text-white truncate">{symbol.label}</h2>
-                          {livePrice && (
-                            <span className="text-xs font-medium text-green-600 dark:text-green-400 whitespace-nowrap">${livePrice.toFixed(4)}</span>
-                          )}
-                        </div>
-                        <select
-                          value={category}
-                          onChange={(e) => handleLabelChange(symbol.value, e.target.value as SymbolLabel)}
-                          className={`text-xs px-1.5 py-0.5 rounded border ${labelColors[category]} cursor-pointer flex-shrink-0`}
-                        >
-                          {labelOrder.map((label) => (
-                            <option key={label} value={label}>
-                              {label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      {/* Row 2: Bias and Fullscreen buttons in same line as title/price */}
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <button
-                          onClick={() => setBiasSymbol(symbol.value)}
-                          className="flex-1 px-2 py-1.5 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded text-xs font-medium text-purple-700 dark:text-purple-300 transition-colors flex items-center justify-center gap-1"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                          </svg>
-                          <span className="hidden xs:inline">AI Bias</span>
-                        </button>
-                        <button
-                          onClick={() => handleFullscreen(symbol)}
-                          className="flex-1 px-2 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors flex items-center justify-center gap-1"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                          </svg>
-                          <span className="hidden xs:inline">Chart</span>
-                        </button>
-                      </div>
-                      
-                      {/* Collapsible content */}
-                      {(expandedSymbols[symbol.value] !== false) && (
-                        <>
-                          <div className="space-y-2 mb-3">
-                            {alerts.map((alert) => (
-                              <div key={alert.id} className="flex gap-1 md:gap-2">
-                                <input
-                                  type="number"
-                                  step="0.0001"
-                                  placeholder="Price"
-                                  value={alert.price}
-                                  onChange={(e) => updateAlert(symbol.value, alert.id, 'price', e.target.value)}
-                                  className="flex-1 md:flex-1 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                />
-                                <input
-                                  type="text"
-                                  placeholder="Label"
-                                  value={alert.label}
-                                  onChange={(e) => updateAlert(symbol.value, alert.id, 'label', e.target.value)}
-                                  className="flex-1 min-w-0 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                />
-                                <select
-                                  value={alert.type}
-                                  onChange={(e) => updateAlert(symbol.value, alert.id, 'type', e.target.value)}
-                                  className="w-9 sm:w-16 px-0 sm:px-1 py-1.5 text-base sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-center"
-                                >
-                                  {isMobile ? (
-                                    <>
-                                      <option value="crossing_up">↑</option>
-                                      <option value="crossing_down">↓</option>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <option value="crossing_up">↑ Up</option>
-                                      <option value="crossing_down">↓ Down</option>
-                                    </>
-                                  )}
-                                </select>
-                                <button
-                                  onClick={() => removeAlert(symbol.value, alert.id)}
-                                  className="w-7 sm:w-8 px-1 sm:px-2 py-1.5 text-sm sm:text-base bg-red-600 text-white rounded hover:bg-red-700 flex-shrink-0"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => addAlert(symbol.value)}
-                              className="flex-1 text-sm px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700"
-                            >
-                              + Add Alert
-                            </button>
-                            <button
-                              onClick={() => saveAlerts(symbol.value)}
-                              className="flex-1 text-sm px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            >
-                              Save
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
+          <div className="flex gap-2 overflow-x-auto p-2 border-b border-gray-200 dark:border-gray-700 symbol-scroll scroll-smooth">
+            {sortedSymbols.map((s) => (
+              <button
+                key={s.value}
+                onClick={() => setSelectedSymbolValue(s.value)}
+                className={`px-2 py-1 text-xs sm:text-sm rounded-full border snap-start ${
+                  selectedSymbol?.value === s.value
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600'
+                }`}
+              >
+                {s.value}
+              </button>
+            ))}
+          </div>
+          {selectedSymbol && (
+            <div className="p-3 md:p-4">
+              <div className="flex items-baseline gap-2 mb-2">
+                <h2 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">{selectedSymbol.label}</h2>
+                {selectedLivePrice && (
+                  <span className="text-sm font-medium text-green-600 dark:text-green-400">${selectedLivePrice.toFixed(4)}</span>
+                )}
+              </div>
 
-                    {/* Desktop Layout: Original design with drag handle */}
-                    <div className="hidden md:block">
-                      <div className="flex justify-between items-center mb-3">
-                        <div className="flex items-center gap-2 flex-1">
-                          {/* Drag Handle - Desktop only */}
-                          <div className="flex items-center gap-1">
-                            <div className="cursor-grab active:cursor-grabbing p-1" title="Drag to reorder">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-                              </svg>
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              <button
-                                onClick={() => moveSymbol(index, 'up')}
-                                disabled={index === 0}
-                                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                title="Move up"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => moveSymbol(index, 'down')}
-                                disabled={index === sortedSymbols.length - 1}
-                                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                title="Move down"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                          <div className="flex items-baseline gap-2">
-                            <h2 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">{symbol.label}</h2>
-                            {livePrice && (
-                              <span className="text-sm font-medium text-green-600 dark:text-green-400">${livePrice.toFixed(4)}</span>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => setBiasSymbol(symbol.value)}
-                            className="p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900 rounded transition-colors"
-                            title="View AI Bias Analysis"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => handleFullscreen(symbol)}
-                            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                            title="View Fullscreen"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                            </svg>
-                          </button>
-                        </div>
-                        <select
-                          value={category}
-                          onChange={(e) => handleLabelChange(symbol.value, e.target.value as SymbolLabel)}
-                          className={`text-xs px-2 py-1 rounded border ${labelColors[category]} cursor-pointer`}
-                        >
-                          {labelOrder.map((label) => (
-                            <option key={label} value={label}>
-                              {label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+              <div className="space-y-2 mb-3">
+                {selectedAlerts.map((alert) => (
+                  <div key={alert.id} className="flex gap-1 md:gap-2 items-center">
+                    <input
+                      type="number"
+                      step="0.0001"
+                      placeholder="Price"
+                      value={alert.price}
+                      onChange={(e) => updateAlert(selectedSymbol.value, alert.id, 'price', e.target.value)}
+                      className="flex-1 md:flex-1 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Label"
+                      value={alert.label}
+                      onChange={(e) => updateAlert(selectedSymbol.value, alert.id, 'label', e.target.value)}
+                      className="flex-1 min-w-0 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => updateAlert(selectedSymbol.value, alert.id, 'type', 'crossing_up')}
+                        className={`${alert.type === 'crossing_up' ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'} px-2 py-1.5 text-xs sm:text-sm rounded`}
+                        title="Up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        onClick={() => updateAlert(selectedSymbol.value, alert.id, 'type', 'crossing_down')}
+                        className={`${alert.type === 'crossing_down' ? 'bg-red-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'} px-2 py-1.5 text-xs sm:text-sm rounded`}
+                        title="Down"
+                      >
+                        ↓
+                      </button>
                     </div>
-                    
-                    {(expandedSymbols[symbol.value] !== false) && (
-                      <>
-                        <div className="space-y-2 mb-3">
-                          {alerts.map((alert) => (
-                            <div key={alert.id} className="flex gap-1 md:gap-2">
-                              <input
-                                type="number"
-                                step="0.0001"
-                                placeholder="Price"
-                                value={alert.price}
-                                onChange={(e) => updateAlert(symbol.value, alert.id, 'price', e.target.value)}
-                                className="flex-1 md:flex-1 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Label"
-                                value={alert.label}
-                                onChange={(e) => updateAlert(symbol.value, alert.id, 'label', e.target.value)}
-                                className="flex-1 min-w-0 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              />
-                              <select
-                                value={alert.type}
-                                onChange={(e) => updateAlert(symbol.value, alert.id, 'type', e.target.value)}
-                                className="w-9 sm:w-16 px-0 sm:px-1 py-1.5 text-base sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-center"
-                              >
-                                {isMobile ? (
-                                  <>
-                                    <option value="crossing_up">↑</option>
-                                    <option value="crossing_down">↓</option>
-                                  </>
-                                ) : (
-                                  <>
-                                    <option value="crossing_up">↑ Up</option>
-                                    <option value="crossing_down">↓ Down</option>
-                                  </>
-                                )}
-                              </select>
-                              <button
-                                onClick={() => removeAlert(symbol.value, alert.id)}
-                                className="w-7 sm:w-8 px-1 sm:px-2 py-1.5 text-sm sm:text-base bg-red-600 text-white rounded hover:bg-red-700 flex-shrink-0"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => addAlert(symbol.value)}
-                            className="flex-1 text-sm px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700"
-                          >
-                            + Add Alert
-                          </button>
-                          <button
-                            onClick={() => saveAlerts(symbol.value)}
-                            className="flex-1 text-sm px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700"
-                          >
-                            Save
-                          </button>
-                        </div>
-                      </>
-                    )}
                   </div>
-                  
-                  {(expandedSymbols[symbol.value] !== false) && (
-                    <>
-                      <div className="h-[350px]">
-                        <ChartWithAlerts 
-                          symbolValue={symbol.value}
-                          tvSymbol={symbol.tv_symbol}
-                          darkMode={darkMode}
-                          alerts={activeDbAlerts.filter(a => a.symbol === symbol.value).map(a => ({ price: a.price, type: a.type }))}
-                          currentPrice={livePrice || undefined}
+                ))}
+              </div>
+              <div className="flex gap-2 mb-3">
+                <button
+                  onClick={() => addAlert(selectedSymbol.value)}
+                  className="flex-1 text-sm px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  + Add Alert
+                </button>
+                <button
+                  onClick={() => saveAlerts(selectedSymbol.value)}
+                  className="flex-1 text-sm px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Save
+                </button>
+              </div>
+
+              <div className="h-[350px] mb-3">
+                <ChartWithAlerts
+                  symbolValue={selectedSymbol.value}
+                  tvSymbol={selectedSymbol.tv_symbol}
+                  darkMode={darkMode}
+                  alerts={(Array.isArray(activeDbAlerts) ? activeDbAlerts : [])
+                    .filter(a => a.symbol === selectedSymbol.value)
+                    .map(a => ({ price: a.price, type: a.type }))}
+                  currentPrice={selectedLivePrice || undefined}
+                />
+              </div>
+
+              <div className="mb-3">
+                <button
+                  onClick={generateReport}
+                  className="w-full text-sm px-3 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700"
+                  disabled={reportLoading}
+                >
+                  {reportLoading ? 'Generating Report...' : 'Generate Report'}
+                </button>
+                {reportError && (
+                  <div className="mt-2 text-xs text-red-600">{reportError}</div>
+                )}
+                {reportResults && (
+                  <div className="mt-3 space-y-3">
+                    {reportResults.image && (
+                      <div>
+                        <img
+                          src={`data:image/png;base64,${reportResults.image}`}
+                          alt="Annotated chart"
+                          className="w-full max-w-[1000px] border rounded"
                         />
                       </div>
-                      
-                      {/* Live Alerts Display */}
-                      <LiveAlerts 
-                        symbolValue={symbol.value}
-                        activeAlerts={activeDbAlerts}
-                        triggeredAlerts={triggeredDbAlerts}
-                        onDelete={handleAlertDelete}
-                        currentPrice={livePrice || undefined}
-                      />
-                    </>
-                  )}
-                  
-                  {/* Bias Sheet Row */}
-                  {biasSheetData[symbol.value] && (
-                    <div className="px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-t border-gray-200 dark:border-gray-700">
-                      <div className="grid grid-cols-6 gap-2 text-center text-xs">
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">Bias</div>
-                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].bias)}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">USD</div>
-                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].usdBias)}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">PD</div>
-                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].pdCandle)}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">Dir</div>
-                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].direction)}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">HTF</div>
-                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].htfTrend)}</div>
-                        </div>
-                        <div>
-                          <div className="text-gray-600 dark:text-gray-400 mb-1 font-medium">LTF</div>
-                          <div className="text-lg">{getIndicatorEmoji(biasSheetData[symbol.value].ltfTrend)}</div>
-                        </div>
+                    )}
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <div className="font-semibold">Market Structure</div>
+                        <div className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{reportResults.structure}</div>
+                      </div>
+                      <div>
+                        <div className="font-semibold">SMC</div>
+                        <div className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{reportResults.smc}</div>
+                      </div>
+                      <div>
+                        <div className="font-semibold">Support & Resistance</div>
+                        <div className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{reportResults.sr}</div>
                       </div>
                     </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                  </div>
+                )}
+              </div>
+
+              <LiveAlerts
+                symbolValue={selectedSymbol.value}
+                activeAlerts={(Array.isArray(activeDbAlerts) ? activeDbAlerts : [])}
+                triggeredAlerts={(Array.isArray(triggeredDbAlerts) ? triggeredDbAlerts : [])}
+                onDelete={handleAlertDelete}
+                currentPrice={selectedLivePrice || undefined}
+              />
+            </div>
+          )}
         </div>
       </div>
       
@@ -1236,6 +1093,29 @@ export default function Home() {
           </svg>
         </button>
       )}
+      <style jsx>{`
+        .symbol-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(100,100,120,0.5) transparent;
+          scroll-snap-type: x mandatory;
+          overscroll-behavior-x: contain;
+        }
+        .symbol-scroll::-webkit-scrollbar {
+          height: 10px;
+        }
+        .symbol-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .symbol-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(90deg, rgba(59,130,246,0.6), rgba(147,51,234,0.6));
+          border-radius: 9999px;
+          border: 2px solid transparent;
+          background-clip: padding-box;
+        }
+        .dark .symbol-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(90deg, rgba(96,165,250,0.7), rgba(147,51,234,0.7));
+        }
+      `}</style>
     </div>
   )
 }
