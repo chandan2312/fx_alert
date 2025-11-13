@@ -8,9 +8,10 @@ interface TradingViewWidgetProps {
   onFullscreen?: () => void;
   darkMode?: boolean;
   currentPrice?: number;
+  interval?: string;
 }
 
-function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false, currentPrice }: TradingViewWidgetProps) {
+function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false, currentPrice, interval = '60' }: TradingViewWidgetProps) {
   const container = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<any>(null);
   const scriptRef = useRef<HTMLScriptElement | null>(null);
@@ -31,7 +32,7 @@ function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false
     script.innerHTML = JSON.stringify({
       autosize: true,
       symbol: symbol,
-      interval: "60",
+      interval: interval,
       timezone: "Asia/Kolkata",
       theme: darkMode ? "dark" : "light",
       style: "1",

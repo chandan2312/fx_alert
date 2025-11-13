@@ -9,9 +9,10 @@ interface ChartWithAlertsProps {
   darkMode?: boolean
   alerts: Array<{ price: number; type: string }>
   currentPrice?: number
+  interval?: string
 }
 
-export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = false, alerts, currentPrice }: ChartWithAlertsProps) {
+export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = false, alerts, currentPrice, interval = '60' }: ChartWithAlertsProps) {
   const [isVisible, setIsVisible] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -54,6 +55,7 @@ export default function ChartWithAlerts({ symbolValue, tvSymbol, darkMode = fals
           alerts={alerts} 
           darkMode={darkMode}
           currentPrice={currentPrice}
+          interval={interval}
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">

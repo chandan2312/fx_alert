@@ -81,6 +81,13 @@ export default function Home() {
   const [showBiasSheet, setShowBiasSheet] = useState(false)
   const [biasSheetData, setBiasSheetData] = useState<Record<string, any>>({})
   const [focusMode, setFocusMode] = useState(false)
+  const [timeframe, setTimeframe] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const tf = localStorage.getItem('tvInterval')
+      return tf || '60'
+    }
+    return '60'
+  })
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [selectedSymbolValue, setSelectedSymbolValue] = useState<string>(() => symbols[0]?.value || '')
 
@@ -461,7 +468,7 @@ export default function Home() {
     const currentAlerts = getAlertsForSymbol(symbolValue)
     setSymbolAlerts({
       ...symbolAlerts,
-      [symbolValue]: [...currentAlerts, { id: Date.now(), price: '', type: 'crossing_up', label: '' }]
+      [symbolValue]: [...currentAlerts, { id: Date.now() + Math.random(), price: '', type: 'crossing_up', label: '' }]
     })
   }
 
@@ -524,8 +531,7 @@ export default function Home() {
       setSymbolAlerts({
         ...symbolAlerts,
         [symbolValue]: [
-          { id: Date.now(), price: '', type: 'crossing_up', label: '' },
-          { id: Date.now() + 1, price: '', type: 'crossing_up', label: '' }
+          { id: Date.now() + Math.random(), price: '', type: 'crossing_up', label: '' }
         ]
       })
       
@@ -550,25 +556,16 @@ export default function Home() {
     setFullscreenSymbol(null)
   }, [])
 
-  // Memoize sorted symbols to avoid re-sorting on every render
-  const labelOrder: SymbolLabel[] = ['Live', 'Super', 'Good', 'Bad', 'Formation', 'Other']
+  // Memoize sorted symbols with fixed order
   const sortedSymbols = useMemo(() => {
-    let filtered = [...symbols]
-    
-    // Apply focus mode filter
-    if (focusMode) {
-      filtered = filtered.filter(s => {
-        const category = s.category || 'Other'
-        return category === 'Live' || category === 'Super' || category === 'Good'
-      })
-    }
-    
-    return filtered.sort((a, b) => {
-      const aCategory = a.category || 'Other'
-      const bCategory = b.category || 'Other'
-      return labelOrder.indexOf(aCategory) - labelOrder.indexOf(bCategory)
+    const order = ['US30','US100','US500','GER40','XAUUSD','BTCUSD','EURUSD','GBPUSD','USDJPY','GBPJPY']
+    const byOrder = [...symbols].sort((a, b) => {
+      const ai = order.indexOf(a.value)
+      const bi = order.indexOf(b.value)
+      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi)
     })
-  }, [symbols, focusMode])
+    return byOrder
+  }, [symbols])
 
   const selectedSymbol = useMemo(() => {
     return sortedSymbols.find(s => s.value === selectedSymbolValue) || sortedSymbols[0]
@@ -606,7 +603,16 @@ export default function Home() {
         throw new Error(msg)
       }
       const data = await res.json()
-      setReportResults(data)
+      const sanitize = (s: any) => {
+        const t = String(s || '')
+        return t.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim()
+      }
+      setReportResults({
+        structure: sanitize(data.structure),
+        smc: sanitize(data.smc),
+        sr: sanitize(data.sr),
+        image: data.image || null
+      })
     } catch (e: any) {
       setReportError(e.message || 'Error generating report')
     } finally {
@@ -805,22 +811,21 @@ export default function Home() {
             </a>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setFocusMode(!focusMode)}
-              className={`p-2 rounded-lg transition-colors ${
-                focusMode 
-                  ? 'bg-yellow-200 dark:bg-yellow-700 hover:bg-yellow-300 dark:hover:bg-yellow-600' 
-                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-              title={focusMode ? 'Show All Symbols' : 'Focus Mode (Live/Super/Good)'}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${
-                focusMode ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-600 dark:text-gray-400'
-              }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </button>
+            <div className="relative">
+              <select
+                value={timeframe}
+                onChange={(e) => { setTimeframe(e.target.value); if (typeof window !== 'undefined') localStorage.setItem('tvInterval', e.target.value) }}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm"
+                title="Timeframe"
+              >
+                <option value="5">5M</option>
+                <option value="15">15M</option>
+                <option value="30">30M</option>
+                <option value="60">1H</option>
+                <option value="240">4H</option>
+                <option value="D">1D</option>
+              </select>
+            </div>
             <button
               onClick={resetSymbols}
               className="p-2 rounded-lg bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
@@ -973,6 +978,7 @@ export default function Home() {
                   symbolValue={selectedSymbol.value}
                   tvSymbol={selectedSymbol.tv_symbol}
                   darkMode={darkMode}
+                  interval={timeframe}
                   alerts={(Array.isArray(activeDbAlerts) ? activeDbAlerts : [])
                     .filter(a => a.symbol === selectedSymbol.value)
                     .map(a => ({ price: a.price, type: a.type }))}
@@ -1030,6 +1036,26 @@ export default function Home() {
             </div>
           )}
         </div>
+        <aside className="w-64 md:w-72 border-l border-gray-200 dark:border-gray-700 p-2 overflow-y-auto hidden md:block">
+          <div className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Triggered Alerts</div>
+          <div className="space-y-2">
+            {(Array.isArray(triggeredDbAlerts) ? triggeredDbAlerts : []).map((a) => (
+              <div key={`${a.id}`} className="p-2 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">{a.symbol}</span>
+                  <button onClick={() => setSelectedSymbolValue(a.symbol)} className="text-xs text-blue-600">Go</button>
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">{a.type} @ {a.price}</div>
+                {a.alertLabel && (
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400">{a.alertLabel}</div>
+                )}
+                {a.triggeredAt && (
+                  <div className="text-[10px] text-gray-400">{new Date(a.triggeredAt).toLocaleString()}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </aside>
       </div>
       
       {/* Fullscreen Chart Modal */}
