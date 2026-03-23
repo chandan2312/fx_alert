@@ -977,7 +977,7 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="h-[350px] mb-3">
+              <div className="h-[525px] mb-3">
                 <ChartWithAlerts
                   symbolValue={selectedSymbol.value}
                   tvSymbol={selectedSymbol.tv_symbol}
