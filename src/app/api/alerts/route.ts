@@ -7,8 +7,22 @@ export async function GET(request: Request) {
   const status = searchParams.get('status')
   
   try {
+    let whereClause: any = status ? { status } : {}
+    
+    if (status === 'triggered') {
+      const twoDaysAgo = new Date()
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+      
+      whereClause = {
+        ...whereClause,
+        triggeredAt: {
+          gte: twoDaysAgo
+        }
+      }
+    }
+
     const alerts = await prisma.alert.findMany({
-      where: status ? { status } : {},
+      where: whereClause,
       orderBy: [
         { status: 'asc' },
         { createdAt: 'desc' }

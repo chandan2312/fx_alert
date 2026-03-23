@@ -35,15 +35,20 @@ export default function Home() {
     { value: 'US500', label: 'SPX/USD', api_symbol: 'SPX%2FUSD', tv_symbol: 'CAPITALCOM:US500', category: 'Other' },
     { value: 'GER40', label: 'DAX/USD', api_symbol: 'DAX%2FUSD', tv_symbol: 'FOREXCOM:GER40', category: 'Other' },
     { value: 'JP225', label: 'Nikkei225/USD', api_symbol: 'Nikkei225%2FUSD', tv_symbol: 'FOREXCOM:JP225', category: 'Other' },
+    { value: 'DXYUSD', label: 'DXY/USD', api_symbol: 'DXY%2FUSD', tv_symbol: 'OANDA:DXYUSD', category: 'Other' },
     { value: 'EURUSD', label: 'EUR/USD', api_symbol: 'EUR%2FUSD', tv_symbol: 'OANDA:EURUSD', category: 'Other' },
     { value: 'GBPUSD', label: 'GBP/USD', api_symbol: 'GBP%2FUSD', tv_symbol: 'OANDA:GBPUSD', category: 'Other' },
+    { value: 'USDCHF', label: 'USD/CHF', api_symbol: 'USD%2FCHF', tv_symbol: 'OANDA:USDCHF', category: 'Other' },
+    { value: 'USDCAD', label: 'USD/CAD', api_symbol: 'USD%2FCAD', tv_symbol: 'OANDA:USDCAD', category: 'Other' },
     { value: 'USDJPY', label: 'USD/JPY', api_symbol: 'USD%2FJPY', tv_symbol: 'OANDA:USDJPY', category: 'Other' },
+    { value: 'GBPJPY', label: 'GBP/JPY', api_symbol: 'GBP%2FJPY', tv_symbol: 'OANDA:GBPJPY', category: 'Other' },
     { value: 'CADJPY', label: 'CAD/JPY', api_symbol: 'CAD%2FJPY', tv_symbol: 'OANDA:CADJPY', category: 'Other' },
-    { value: 'SOLUSD', label: 'SOL/USD', api_symbol: 'SOL%2FUSD', tv_symbol: 'COINBASE:SOLUSD', category: 'Other' },
-    { value: 'ADAUSD', label: 'ADA/USD', api_symbol: 'ADA%2FUSD', tv_symbol: 'COINBASE:ADAUSD', category: 'Other' },
-    { value: 'XRPUSD', label: 'XRP/USD', api_symbol: 'XRP%2FUSD', tv_symbol: 'COINBASE:XRPUSD', category: 'Other' }
+    { value: 'AUDUSD', label: 'AUD/USD', api_symbol: 'AUD%2FUSD', tv_symbol: 'OANDA:AUDUSD', category: 'Other' },
+    { value: 'NZDUSD', label: 'NZD/USD', api_symbol: 'NZD%2FUSD', tv_symbol: 'OANDA:NZDUSD', category: 'Other' },
+    { value: 'NZDUSD', label: 'NZD/USD', api_symbol: 'NZD%2FUSD', tv_symbol: 'OANDA:NZDUSD', category: 'Other' },
+    { value: 'WTIUSD', label: 'WTI/USD', api_symbol: 'WTI%2FUSD', tv_symbol: 'CFI:WTI', category: 'Other' },
   ])
-  
+
   // Initialize alerts with 1 default field for each symbol
   const initializeAlerts = () => {
     const initialAlerts: Record<string, SymbolAlert[]> = {}
@@ -54,7 +59,7 @@ export default function Home() {
     })
     return initialAlerts
   }
-  
+
   const [symbolAlerts, setSymbolAlerts] = useState<Record<string, SymbolAlert[]>>(initializeAlerts)
   const [refreshKey, setRefreshKey] = useState(0)
   const [fullscreenSymbol, setFullscreenSymbol] = useState<Symbol | null>(null)
@@ -95,9 +100,9 @@ export default function Home() {
   useEffect(() => {
     const savedOrder = localStorage.getItem('symbolOrder')
     const savedCategories = localStorage.getItem('symbolCategories')
-    
+
     let updatedSymbols = [...symbols]
-    
+
     // Load saved categories
     if (savedCategories) {
       try {
@@ -110,7 +115,7 @@ export default function Home() {
         console.error('Error loading symbol categories:', error)
       }
     }
-    
+
     // Load saved order
     if (savedOrder) {
       try {
@@ -118,7 +123,7 @@ export default function Home() {
         const reorderedSymbols = orderArray
           .map((value: string) => updatedSymbols.find(s => s.value === value))
           .filter((s: Symbol | undefined): s is Symbol => s !== undefined)
-        
+
         // Add any new symbols that weren't in saved order
         const missingSymbols = updatedSymbols.filter(s => !orderArray.includes(s.value))
         updatedSymbols = [...reorderedSymbols, ...missingSymbols]
@@ -126,7 +131,7 @@ export default function Home() {
         console.error('Error loading symbol order:', error)
       }
     }
-    
+
     setSymbols(updatedSymbols)
   }, [])
 
@@ -152,17 +157,17 @@ export default function Home() {
       const cachedPrices = localStorage.getItem('livePrices')
       const cacheTimestamp = localStorage.getItem('pricesCacheTime')
       const now = Date.now()
-      
+
       // Use cache if less than 5 minutes old
       if (cachedPrices && cacheTimestamp && (now - parseInt(cacheTimestamp)) < 5 * 60 * 1000) {
         setLivePrices(JSON.parse(cachedPrices))
         return
       }
-      
+
       // Fetch fresh prices only if cache is stale or missing
       const apiSymbols = symbols.map(s => s.api_symbol.replace('%2F', '/'))
       const prices = await fetchLivePrices(apiSymbols)
-      
+
       if (Object.keys(prices).length > 0) {
         setLivePrices(prices)
         // Cache the prices and timestamp
@@ -170,7 +175,7 @@ export default function Home() {
         localStorage.setItem('pricesCacheTime', now.toString())
       }
     }
-    
+
     fetchPrices()
     // DO NOT set interval - only fetch once on mount
   }, [])
@@ -204,7 +209,7 @@ export default function Home() {
         setTriggeredDbAlerts([])
       }
     }
-    
+
     fetchAllAlerts()
     const interval = setInterval(fetchAllAlerts, 10000) // Update every 10 seconds
     return () => clearInterval(interval)
@@ -281,7 +286,7 @@ export default function Home() {
   const handleAlertFocus = (symbolValue: string, alertId: number) => {
     const symbol = symbols.find(s => s.value === symbolValue)
     if (!symbol) return
-    
+
     const livePrice = getLivePrice(symbol.api_symbol)
     if (livePrice) {
       updateAlert(symbolValue, alertId, 'price', livePrice.toString())
@@ -291,12 +296,12 @@ export default function Home() {
   const moveSymbol = (fromIndex: number, direction: 'up' | 'down') => {
     const newSymbols = [...sortedSymbols]
     const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1
-    
+
     if (toIndex < 0 || toIndex >= newSymbols.length) return
-    
+
     // Swap
     [newSymbols[fromIndex], newSymbols[toIndex]] = [newSymbols[toIndex], newSymbols[fromIndex]]
-    
+
     // Update the original symbols array with new order
     const reorderedSymbols = newSymbols.map(s => symbols.find(sym => sym.value === s.value)!)
     setSymbols(reorderedSymbols)
@@ -306,26 +311,26 @@ export default function Home() {
 
   const handleDragStart = (e: React.DragEvent | React.TouchEvent, index: number) => {
     setDraggedIndex(index)
-    
+
     if ('dataTransfer' in e) {
       e.dataTransfer.effectAllowed = 'move'
       e.dataTransfer.setData('text/html', e.currentTarget.innerHTML)
     }
-    
+
     if (e.currentTarget instanceof HTMLElement) {
       e.currentTarget.style.opacity = '0.5'
     }
-    
+
     let lastY = 'touches' in e ? e.touches[0].clientY : e.clientY
-    
+
     // Enable auto-scroll while dragging
     const scrollInterval = setInterval(() => {
       const container = document.querySelector('.main-scroll-container')
       if (!container) return
-      
+
       const rect = container.getBoundingClientRect()
       const scrollThreshold = 150
-      
+
       // Scroll up if near top
       if (lastY < rect.top + scrollThreshold) {
         container.scrollTop -= 20
@@ -335,17 +340,17 @@ export default function Home() {
         container.scrollTop += 20
       }
     }, 30)
-    
-    // Store interval ID to clear later
-    ;(window as any).dragScrollInterval = scrollInterval
-    
+
+      // Store interval ID to clear later
+      ; (window as any).dragScrollInterval = scrollInterval
+
     // Track mouse/touch position for auto-scroll
     const trackPosition = (e: MouseEvent | TouchEvent) => {
       lastY = 'touches' in e ? e.touches[0].clientY : e.clientY
     }
     window.addEventListener('mousemove', trackPosition)
     window.addEventListener('touchmove', trackPosition)
-    ;(window as any).dragPositionTracker = trackPosition
+      ; (window as any).dragPositionTracker = trackPosition
   }
 
   const handleDragEnd = (e: React.DragEvent | React.TouchEvent) => {
@@ -353,13 +358,13 @@ export default function Home() {
       e.currentTarget.style.opacity = '1'
     }
     setDraggedIndex(null)
-    
+
     // Clear auto-scroll interval
     if ((window as any).dragScrollInterval) {
       clearInterval((window as any).dragScrollInterval)
       delete (window as any).dragScrollInterval
     }
-    
+
     // Remove position tracker
     if ((window as any).dragPositionTracker) {
       window.removeEventListener('mousemove', (window as any).dragPositionTracker)
@@ -377,17 +382,17 @@ export default function Home() {
     if ('preventDefault' in e) {
       e.preventDefault()
     }
-    
+
     if (draggedIndex === null || draggedIndex === dropIndex) return
-    
+
     const newSymbols = [...sortedSymbols]
     const draggedSymbol = newSymbols[draggedIndex]
-    
+
     // Remove from old position
     newSymbols.splice(draggedIndex, 1)
     // Insert at new position
     newSymbols.splice(dropIndex, 0, draggedSymbol)
-    
+
     // Update the original symbols array with new order
     const reorderedSymbols = newSymbols.map(s => symbols.find(sym => sym.value === s.value)!)
     setSymbols(reorderedSymbols)
@@ -397,20 +402,20 @@ export default function Home() {
 
   const handleTouchStart = (e: React.TouchEvent, index: number) => {
     const touch = e.touches[0]
-    ;(window as any).touchStartY = touch.clientY
-    ;(window as any).touchStartTime = Date.now()
-    
-    // Trigger drag after 200ms hold
-    ;(window as any).longPressTimer = setTimeout(() => {
-      handleDragStart(e, index)
-    }, 200)
+      ; (window as any).touchStartY = touch.clientY
+      ; (window as any).touchStartTime = Date.now()
+
+      // Trigger drag after 200ms hold
+      ; (window as any).longPressTimer = setTimeout(() => {
+        handleDragStart(e, index)
+      }, 200)
   }
 
   const handleTouchMove = (e: React.TouchEvent, index: number) => {
     if ((window as any).longPressTimer) {
       const touch = e.touches[0]
       const deltaY = Math.abs(touch.clientY - (window as any).touchStartY)
-      
+
       // Cancel long press if moved too much before timer
       if (deltaY > 10 && draggedIndex === null) {
         clearTimeout((window as any).longPressTimer)
@@ -418,18 +423,18 @@ export default function Home() {
         return
       }
     }
-    
+
     // If dragging is active, find the drop target
     if (draggedIndex !== null) {
       e.preventDefault()
       const touch = e.touches[0]
       const elements = document.elementsFromPoint(touch.clientX, touch.clientY)
       const cardElement = elements.find(el => el.classList.contains('symbol-card'))
-      
+
       if (cardElement) {
         const dropIndex = parseInt(cardElement.getAttribute('data-index') || '-1')
         if (dropIndex >= 0 && dropIndex !== draggedIndex) {
-          ;(window as any).currentDropIndex = dropIndex
+          ; (window as any).currentDropIndex = dropIndex
         }
       }
     }
@@ -440,7 +445,7 @@ export default function Home() {
       clearTimeout((window as any).longPressTimer)
       delete (window as any).longPressTimer
     }
-    
+
     if (draggedIndex !== null) {
       const dropIndex = (window as any).currentDropIndex
       if (dropIndex !== undefined && dropIndex >= 0) {
@@ -452,7 +457,7 @@ export default function Home() {
   }
 
   const handleLabelChange = (symbolValue: string, label: SymbolLabel) => {
-    const updatedSymbols = symbols.map(s => 
+    const updatedSymbols = symbols.map(s =>
       s.value === symbolValue ? { ...s, category: label } : s
     )
     setSymbols(updatedSymbols)
@@ -484,7 +489,7 @@ export default function Home() {
     const currentAlerts = getAlertsForSymbol(symbolValue)
     setSymbolAlerts({
       ...symbolAlerts,
-      [symbolValue]: currentAlerts.map(alert => 
+      [symbolValue]: currentAlerts.map(alert =>
         alert.id === id ? { ...alert, [field]: value } : alert
       )
     })
@@ -506,7 +511,7 @@ export default function Home() {
       // Save each alert to database
       const expirationDate = new Date()
       expirationDate.setDate(expirationDate.getDate() + 7) // Default 7 days
-      
+
       const promises = validAlerts.map(alert =>
         fetch('/api/alerts', {
           method: 'POST',
@@ -526,7 +531,7 @@ export default function Home() {
 
       await Promise.all(promises)
       showToast(`${validAlerts.length} alert(s) saved for ${symbol.label}!`, 'success')
-      
+
       // Clear the alerts after saving
       setSymbolAlerts({
         ...symbolAlerts,
@@ -534,7 +539,7 @@ export default function Home() {
           { id: Date.now() + Math.random(), price: '', type: 'crossing_up', label: '' }
         ]
       })
-      
+
       // Trigger a refresh of live alerts
       setRefreshKey(prev => prev + 1)
     } catch (error) {
@@ -558,7 +563,7 @@ export default function Home() {
 
   // Memoize sorted symbols with fixed order
   const sortedSymbols = useMemo(() => {
-    const order = ['US30','US100','US500','GER40','XAUUSD','BTCUSD','EURUSD','GBPUSD','USDJPY','GBPJPY']
+    const order = ['US30', 'US100', 'US500', 'GER40', 'XAUUSD', 'BTCUSD', 'EURUSD', 'GBPUSD', 'USDJPY', 'GBPJPY']
     const byOrder = [...symbols].sort((a, b) => {
       const ai = order.indexOf(a.value)
       const bi = order.indexOf(b.value)
@@ -580,7 +585,7 @@ export default function Home() {
   }, [selectedSymbol, livePrices])
 
   const [reportLoading, setReportLoading] = useState(false)
-  const [reportResults, setReportResults] = useState<{structure?: string; smc?: string; sr?: string; image?: string | null} | null>(null)
+  const [reportResults, setReportResults] = useState<{ structure?: string; smc?: string; sr?: string; image?: string | null } | null>(null)
   const [reportError, setReportError] = useState<string>('')
 
   const generateReport = async () => {
@@ -599,7 +604,7 @@ export default function Home() {
         try {
           const err = await res.json()
           if (err?.error) msg = err.error
-        } catch {}
+        } catch { }
         throw new Error(msg)
       }
       const data = await res.json()
@@ -633,7 +638,7 @@ export default function Home() {
   const refreshPrices = useCallback(async () => {
     const apiSymbols = symbols.map(s => s.api_symbol.replace('%2F', '/'))
     const prices = await fetchLivePrices(apiSymbols)
-    
+
     if (Object.keys(prices).length > 0) {
       setLivePrices(prices)
       localStorage.setItem('livePrices', JSON.stringify(prices))
@@ -651,7 +656,7 @@ export default function Home() {
       const headerHeight = 60 // Fixed header height
       const elementPosition = element.getBoundingClientRect().top
       const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20
-      
+
       window.scrollTo({
         top: offsetPosition,
         behavior: 'smooth'
@@ -681,25 +686,25 @@ export default function Home() {
   // Refresh all bias analyses
   const refreshAllBiasAnalyses = async () => {
     if (refreshingBias) return
-    
+
     setRefreshingBias(true)
     const total = symbols.length
     setBiasProgress({ current: 0, total })
-    
+
     let successCount = 0
     let failCount = 0
-    
+
     for (let i = 0; i < symbols.length; i++) {
       const symbol = symbols[i]
       setBiasProgress({ current: i + 1, total })
-      
+
       try {
         const response = await fetch('/api/bias', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ symbol: symbol.value })
         })
-        
+
         if (response.ok) {
           successCount++
         } else {
@@ -709,14 +714,14 @@ export default function Home() {
         console.error(`Error updating bias for ${symbol.value}:`, error)
         failCount++
       }
-      
+
       // Add a small delay to avoid overwhelming the API
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
-    
+
     setRefreshingBias(false)
     setBiasProgress({ current: 0, total: 0 })
-    
+
     if (successCount > 0) {
       showToast(`✅ Updated ${successCount} bias analyses!`, 'success')
     }
@@ -729,7 +734,7 @@ export default function Home() {
   const resetSymbols = () => {
     const confirmed = window.confirm('Are you sure you want to reset all symbols to default order and category (Other)?')
     if (!confirmed) return
-    
+
     const defaultSymbols: Symbol[] = [
       { value: 'XAUUSD', label: 'Gold/USD', api_symbol: 'Gold%2FUSD', tv_symbol: 'OANDA:XAUUSD', category: 'Other' },
       { value: 'BTCUSD', label: 'BTC/USD', api_symbol: 'BTC%2FUSD', tv_symbol: 'COINBASE:BTCUSD', category: 'Other' },
@@ -746,7 +751,7 @@ export default function Home() {
       { value: 'ADAUSD', label: 'ADA/USD', api_symbol: 'ADA%2FUSD', tv_symbol: 'COINBASE:ADAUSD', category: 'Other' },
       { value: 'XRPUSD', label: 'XRP/USD', api_symbol: 'XRP%2FUSD', tv_symbol: 'COINBASE:XRPUSD', category: 'Other' }
     ]
-    
+
     setSymbols(defaultSymbols)
     localStorage.removeItem('symbolOrder')
     localStorage.removeItem('symbolCategories')
@@ -902,11 +907,10 @@ export default function Home() {
               <button
                 key={s.value}
                 onClick={() => setSelectedSymbolValue(s.value)}
-                className={`px-2 py-1 text-xs sm:text-sm rounded-full border snap-start ${
-                  selectedSymbol?.value === s.value
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600'
-                }`}
+                className={`px-2 py-1 text-xs sm:text-sm rounded-full border snap-start ${selectedSymbol?.value === s.value
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600'
+                  }`}
               >
                 {s.value}
               </button>
@@ -1057,7 +1061,7 @@ export default function Home() {
           </div>
         </aside>
       </div>
-      
+
       {/* Fullscreen Chart Modal */}
       {fullscreenSymbol && (
         <FullscreenChart
@@ -1087,11 +1091,10 @@ export default function Home() {
 
       {/* Toast Notification */}
       {toast.show && (
-        <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
-          toast.type === 'success' 
-            ? 'bg-green-600 text-white' 
-            : 'bg-red-600 text-white'
-        }`}>
+        <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${toast.type === 'success'
+          ? 'bg-green-600 text-white'
+          : 'bg-red-600 text-white'
+          }`}>
           <div className="flex items-center gap-2">
             {toast.type === 'success' ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -51,7 +51,7 @@ function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false
       withdateranges: false,
       show_popup_button: true,
       popup_width: "1000",
-      popup_height: "650",
+      popup_height: "900",
       studies: [],
       compareSymbols: [],
       watchlist: [],
@@ -61,15 +61,15 @@ function TradingViewWidget({ symbol, alerts = [], onFullscreen, darkMode = false
       // Show drawing toolbar on side
       enabled_features: ["side_toolbar_in_fullscreen_mode", "header_in_fullscreen_mode"],
       disabled_features: [
-        "header_symbol_search", 
-        "symbol_info", 
+        "header_symbol_search",
+        "symbol_info",
         "header_interval_dialog_button",
         "legend_widget",
         "compare_symbol",
         "border_around_the_chart"
       ]
     });
-    
+
     scriptRef.current = script;
     container.current.appendChild(script);
 

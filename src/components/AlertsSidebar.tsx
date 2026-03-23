@@ -32,7 +32,7 @@ export default function AlertsSidebar() {
       const triggeredRes = await fetch('/api/alerts?status=triggered')
       const triggered = await triggeredRes.json()
       setTriggeredAlerts(triggered.slice(0, 10)) // Show last 10 triggered
-      
+
       setLoading(false)
     } catch (error) {
       console.error('Error fetching alerts:', error)
@@ -85,7 +85,7 @@ export default function AlertsSidebar() {
               {activeAlerts.length}
             </span>
           </div>
-          
+
           {activeAlerts.length === 0 ? (
             <p className="text-sm text-gray-500">No active alerts</p>
           ) : (
@@ -131,7 +131,7 @@ export default function AlertsSidebar() {
               {triggeredAlerts.length}
             </span>
           </div>
-          
+
           {triggeredAlerts.length === 0 ? (
             <p className="text-sm text-gray-500">No triggered alerts</p>
           ) : (
