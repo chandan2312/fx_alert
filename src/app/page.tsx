@@ -35,7 +35,7 @@ export default function Home() {
     { value: 'US500', label: 'SPX/USD', api_symbol: 'SPX%2FUSD', tv_symbol: 'CAPITALCOM:US500', category: 'Other' },
     { value: 'GER40', label: 'DAX/USD', api_symbol: 'DAX%2FUSD', tv_symbol: 'FOREXCOM:GER40', category: 'Other' },
     { value: 'JP225', label: 'Nikkei225/USD', api_symbol: 'Nikkei225%2FUSD', tv_symbol: 'FOREXCOM:JP225', category: 'Other' },
-    { value: 'DXYUSD', label: 'DXY/USD', api_symbol: 'DXY%2FUSD', tv_symbol: 'OANDA:DXYUSD', category: 'Other' },
+    { value: 'DXYUSD', label: 'DXY/USD', api_symbol: 'DXY%2FUSD', tv_symbol: 'CAPITALCOM:DXY', category: 'Other' },
     { value: 'EURUSD', label: 'EUR/USD', api_symbol: 'EUR%2FUSD', tv_symbol: 'OANDA:EURUSD', category: 'Other' },
     { value: 'GBPUSD', label: 'GBP/USD', api_symbol: 'GBP%2FUSD', tv_symbol: 'OANDA:GBPUSD', category: 'Other' },
     { value: 'USDCHF', label: 'USD/CHF', api_symbol: 'USD%2FCHF', tv_symbol: 'OANDA:USDCHF', category: 'Other' },
@@ -44,7 +44,6 @@ export default function Home() {
     { value: 'GBPJPY', label: 'GBP/JPY', api_symbol: 'GBP%2FJPY', tv_symbol: 'OANDA:GBPJPY', category: 'Other' },
     { value: 'CADJPY', label: 'CAD/JPY', api_symbol: 'CAD%2FJPY', tv_symbol: 'OANDA:CADJPY', category: 'Other' },
     { value: 'AUDUSD', label: 'AUD/USD', api_symbol: 'AUD%2FUSD', tv_symbol: 'OANDA:AUDUSD', category: 'Other' },
-    { value: 'NZDUSD', label: 'NZD/USD', api_symbol: 'NZD%2FUSD', tv_symbol: 'OANDA:NZDUSD', category: 'Other' },
     { value: 'NZDUSD', label: 'NZD/USD', api_symbol: 'NZD%2FUSD', tv_symbol: 'OANDA:NZDUSD', category: 'Other' },
     { value: 'WTIUSD', label: 'WTI/USD', api_symbol: 'WTI%2FUSD', tv_symbol: 'CFI:WTI', category: 'Other' },
   ])
